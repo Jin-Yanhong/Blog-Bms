@@ -1,0 +1,17 @@
+{
+  "semi": true,
+  "quoteProps": "as-needed",
+  "bracketSpacing": true,
+  "bracketSameLine": true,
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx", "*.js"],
+      "options": {
+        "tabWidth": 2,
+        "bracketSpacing": true,
+        "useTabs": false,
+        "semi": true
+      }
+    }
+  ]
+}
