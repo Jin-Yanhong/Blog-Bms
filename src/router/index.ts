@@ -14,9 +14,33 @@ export const routes: Array<RouteRecordRaw> = [
         },
     },
     {
+        path: "/dashboard",
+        name: "dashboard",
+        component: AppMain,
+        meta: {
+            title: "dashboard",
+            icon: "dashboard",
+            cache: true,
+            show: false,
+        },
+        children: [
+            {
+                path: "/dashboard",
+                name: "dashboard",
+                meta: {
+                    title: "dashboard",
+                    icon: "dashboard",
+                    cache: true,
+                    show: true,
+                },
+                component: () => import("@/views/dashboard/index.vue"),
+            },
+        ],
+    },
+    {
         path: "/",
         name: "appMain",
-        redirect: "/dashboard",
+        redirect: "/article",
         component: AppMain,
         meta: {
             title: "内容管理",
@@ -32,17 +56,6 @@ export const routes: Array<RouteRecordRaw> = [
                 meta: {
                     title: "article",
                     icon: "article",
-                    cache: true,
-                    show: true,
-                },
-            },
-            {
-                path: "dashboard",
-                name: "dashboard",
-                component: () => import("@/views/dashboard/index.vue"),
-                meta: {
-                    title: "dashboard",
-                    icon: "dashboard",
                     cache: true,
                     show: true,
                 },
