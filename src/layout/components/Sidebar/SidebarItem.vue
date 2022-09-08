@@ -10,7 +10,7 @@
         </ElSubMenu>
     </template>
     <template v-else>
-        <ElMenuItem v-if="item.meta.show">
+        <ElMenuItem v-if="item.meta.show" @click="menuClick(item)">
             <span>
                 {{item.meta.title}}
             </span>
@@ -19,8 +19,10 @@
 </template>
 
 <script lang="ts">
+import router from "@/router";
 import { defineComponent, } from "@vue/runtime-core";
 import { ElSubMenu, ElMenuItem } from "element-plus";
+import { RouteRecordRaw } from "vue-router";
 
 export default defineComponent({
     setup(props: any) {
@@ -39,7 +41,13 @@ export default defineComponent({
         ElMenuItem,
 
     },
-    methods: {},
+    methods: {
+
+        menuClick(menuItem: RouteRecordRaw) {
+            console.log(menuItem)
+            this.$router.push(menuItem.path)
+        }
+    },
 });
 </script>
 

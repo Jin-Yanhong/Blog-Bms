@@ -1,5 +1,5 @@
 <template>
-    <div class="app-container">article</div>
+    <div class="view">article</div>
 </template>
 
 <script lang="ts">
@@ -9,4 +9,6 @@ export default defineComponent({
     name: "view_Article",
 });
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+
+</style>

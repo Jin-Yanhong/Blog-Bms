@@ -9,4 +9,6 @@ export default defineComponent({
     name: "view_dashboard",
 });
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+
+</style>
