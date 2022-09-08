@@ -10,7 +10,7 @@ export const routes: Array<RouteRecordRaw> = [
             title: "login",
             icon: "login",
             cache: true,
-            hiden: false,
+            show: false,
         },
     },
     {
@@ -18,6 +18,12 @@ export const routes: Array<RouteRecordRaw> = [
         name: "appMain",
         redirect: "/dashboard",
         component: AppMain,
+        meta: {
+            title: "内容管理",
+            icon: "login",
+            cache: true,
+            show: false,
+        },
         children: [
             {
                 path: "article",
@@ -27,7 +33,7 @@ export const routes: Array<RouteRecordRaw> = [
                     title: "article",
                     icon: "article",
                     cache: true,
-                    hiden: false,
+                    show: true,
                 },
             },
             {
@@ -38,7 +44,7 @@ export const routes: Array<RouteRecordRaw> = [
                     title: "dashboard",
                     icon: "dashboard",
                     cache: true,
-                    hiden: false,
+                    show: true,
                 },
             },
             {
@@ -49,7 +55,7 @@ export const routes: Array<RouteRecordRaw> = [
                     title: "skills",
                     icon: "skills",
                     cache: true,
-                    hiden: false,
+                    show: true,
                 },
             },
             {
@@ -60,7 +66,7 @@ export const routes: Array<RouteRecordRaw> = [
                     title: "works",
                     icon: "works",
                     cache: true,
-                    hiden: false,
+                    show: true,
                 },
             },
         ],
@@ -71,7 +77,7 @@ export const routes: Array<RouteRecordRaw> = [
         name: "404",
         redirect: "/dashboard",
         meta: {
-            hide: true,
+            show: false,
         },
     },
 ];

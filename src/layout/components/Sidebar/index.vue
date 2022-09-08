@@ -1,7 +1,7 @@
 <template>
     <div class="sidebar">
-        <el-menu default-active="1">
-            <SidebarItem> </SidebarItem>
+        <el-menu mode="vertical">
+            <SidebarItem v-for="route in routerList" :item="route" />
         </el-menu>
     </div>
 </template>
@@ -15,7 +15,6 @@ import { routes } from "@/router";
 export default defineComponent({
     setup() {
         const routerList = routes;
-
         return {
             routerList,
         };
@@ -27,23 +26,14 @@ export default defineComponent({
         Setting,
         SidebarItem,
     },
-    methods: {
-        handleOpen(key: string, keyPath: string[]) {
-            console.log(key, keyPath);
-        },
-        handleClose(key: string, keyPath: string[]) {
-            console.log(key, keyPath);
-        },
-    },
+    methods: {},
 });
 </script>
 <style lang="scss" scoped>
 .sidebar {
     width: 200px;
-    // box-sizing: border-box;
     border-right: solid 1px var(--el-menu-border-color);
 
-    // 穿透组件样式
     :deep(.el-menu) {
         border: none;
     }
