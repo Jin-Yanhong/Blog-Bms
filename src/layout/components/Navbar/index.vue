@@ -10,7 +10,9 @@ export default defineComponent({
 });
 </script>
 <style lang="scss" scoped>
+@import "@/style/variables.scss";
+
 .navbar {
-    bottom: 1px solid;
+    bottom: 1px solid $border-color;
 }
 </style>

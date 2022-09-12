@@ -1,17 +1,23 @@
 {
-    "semi": true,
-    "quoteProps": "as-needed",
-    "bracketSpacing": true,
-    "bracketSameLine": true,
-    "overrides": [
-        {
-            "files": ["*.ts", "*.tsx", "*.js"],
-            "options": {
-                "tabWidth": 4,
-                "bracketSpacing": true,
-                "useTabs": false,
-                "semi": true
-            }
-        }
-    ]
+	"semi": true,
+	"tabWidth": 4,
+	"printWidth": 80,
+	"useTabs": true,
+	"quoteProps": "as-needed",
+	"bracketSpacing": true,
+	"bracketSameLine": false,
+	"overrides": [
+		{
+			"files": ["*.ts", "*.tsx", "*.js"],
+			"options": {
+				"semi": true,
+				"tabWidth": 4,
+				"useTabs": true,
+				"quoteProps": "as-needed",
+				"bracketSpacing": true,
+				"bracketSameLine": true,
+				"printWidth": 80
+			}
+		}
+	]
 }

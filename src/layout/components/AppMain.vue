@@ -8,8 +8,8 @@
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
-import Sidebar from "./Sidebar/index.vue";
 import Navbar from "./Navbar/index.vue";
+import Sidebar from "./Sidebar/index.vue";
 export default defineComponent({
     setup() {
         return {};
@@ -25,11 +25,8 @@ export default defineComponent({
 .app-container {
     display: grid;
     grid-template-rows: [r1] 80px [r2] calc(100vh - 80px) [r3];
-    grid-template-columns: [r1] 200px [r2] calc(100vw - 200px) [r3];
+    grid-template-columns: [r1] 300px [r2] calc(100vw - 300px) [r3];
     grid-auto-flow: row;
-    grid-template-areas:
-        "a b"
-        "c d";
 
     .sidebar {
         grid-row-start: 1;
