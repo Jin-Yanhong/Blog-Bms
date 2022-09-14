@@ -8,40 +8,15 @@
 							<span>System Login</span>
 						</div>
 					</template>
-					<el-form
-						:model="form"
-						:label-width="labelWidth"
-						label-position="left"
-						ref="loginFormRef"
-						:rules="rules"
-					>
-						<el-form-item
-							label="user name"
-							prop="userName"
-							required
-						>
-							<el-input
-								v-model="form.userName"
-								placeholder="your user name"
-							/>
+					<el-form :model="form" :label-width="labelWidth" label-position="left" ref="loginFormRef" :rules="rules">
+						<el-form-item label="user name" prop="userName" required>
+							<el-input v-model="form.userName" placeholder="your user name" />
 						</el-form-item>
-						<el-form-item
-							label="user password"
-							prop="password"
-							required
-						>
-							<el-input
-								type="password"
-								v-model="form.password"
-								placeholder="password"
-							/>
+						<el-form-item label="user password" prop="password" required>
+							<el-input type="password" v-model="form.password" placeholder="password" />
 						</el-form-item>
 						<el-form-item>
-							<el-button
-								type="primary"
-								@click="onSubmit(loginFormRef)"
-								>Login</el-button
-							>
+							<el-button type="primary" @click="onSubmit(loginFormRef)">Login</el-button>
 						</el-form-item>
 					</el-form>
 				</el-card>
@@ -51,9 +26,9 @@
 </template>
 
 <script lang="ts">
-import route from "@/router";
-import { defineComponent, reactive, ref } from "@vue/runtime-core";
-import type { FormInstance, FormRules } from "element-plus";
+import route from '@/router';
+import { defineComponent, reactive, ref } from '@vue/runtime-core';
+import type { FormInstance, FormRules } from 'element-plus';
 interface loginForm {
 	userName: string;
 	password: string;
@@ -62,10 +37,10 @@ interface loginForm {
 export default defineComponent({
 	setup() {
 		let form = reactive<loginForm>({
-			userName: "",
-			password: "",
+			userName: '',
+			password: '',
 		});
-		let labelWidth = ref("120px");
+		let labelWidth = ref('120px');
 
 		const loginFormRef = ref<FormInstance>();
 
@@ -73,15 +48,15 @@ export default defineComponent({
 			userName: [
 				{
 					required: true,
-					message: "Please input user name",
-					trigger: "blur",
+					message: 'Please input user name',
+					trigger: 'blur',
 				},
 			],
 			password: [
 				{
 					required: true,
-					message: "Please select user password",
-					trigger: "change",
+					message: 'Please select user password',
+					trigger: 'change',
 				},
 			],
 		});
@@ -93,7 +68,7 @@ export default defineComponent({
 			loginFormRef,
 		};
 	},
-	name: "view_Login",
+	name: 'view_Login',
 	methods: {
 		onSubmit: async (formEl: FormInstance | undefined) => {
 			if (!formEl) return;
@@ -101,9 +76,9 @@ export default defineComponent({
 				if (valid) {
 					// TODO: login Api
 					// console.log("submit!");
-					route.replace("/");
+					route.replace('/');
 				} else {
-					console.log("error submit!", fields);
+					console.log('error submit!', fields);
 				}
 			});
 		},
