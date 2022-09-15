@@ -12,3 +12,36 @@ export interface skill {
     color: string;
     _id?: string;
 }
+export interface article {
+    title: string;
+    subTitle: string;
+    date: string;
+    groupId: number;
+    author: string;
+    index: number;
+    content: string;
+    _id?: string;
+}
+
+export interface work {
+    name: string;
+    desc: string;
+    tag: Array<string>;
+    technology: Array<string>;
+    screenShortUrl: string;
+    _id?: string;
+}
+
+export interface dict {
+    key: number;
+    index: number;
+    desc: string;
+    label: string;
+    value?: Array<string>;
+    _id?: string;
+}
+
+export interface dictData {
+    label: string;
+    value: number;
+}

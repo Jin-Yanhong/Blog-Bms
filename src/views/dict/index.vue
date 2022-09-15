@@ -15,15 +15,11 @@
 		</div>
 
 		<!--  -->
-		<el-table :data="skillList" class="listTable">
-			<el-table-column prop="index" label="Index" align="center" />
-			<el-table-column prop="name" label="Name" align="center" />
-			<el-table-column prop="score" label="Score" align="center" />
-			<el-table-column prop="color" label="Color" align="center">
-				<template #default="scope">
-					<div class="colorBlock" :style="{ backgroundColor: scope.row.color }">{{ scope.row.color }}</div>
-				</template>
-			</el-table-column>
+		<el-table :data="dictList" class="listTable">
+			<el-table-column prop="index" label="Index" align="center" width="60" />
+			<el-table-column prop="label" label="Label" align="center" width="300" />
+			<el-table-column prop="key" label="Key" align="center" width="60" />
+			<el-table-column prop="desc" label="Description" align="center" />
 			<el-table-column label="Operations" width="260" align="center">
 				<template #default="scope">
 					<el-button type="info" size="small" @click="handleDetail(scope.row)">
@@ -52,18 +48,10 @@
 			<el-form :model="itemForm" class="demo-form-inline" label-position="top">
 				<el-row :gutter="10">
 					<el-col :span="12">
-						<el-form-item label="Name"> <el-input v-model="itemForm.name" placeholder="Skill Name" /> </el-form-item>
+						<el-form-item label="Title"> <el-input v-model="itemForm.label" placeholder="dict Title" /> </el-form-item>
 					</el-col>
 					<el-col :span="12">
-						<el-form-item label="Score"> <el-input v-model="itemForm.score" placeholder="Skill score" /> </el-form-item>
-					</el-col>
-				</el-row>
-				<el-row :gutter="10">
-					<el-col :span="12">
-						<el-form-item label="Index"> <el-input v-model="itemForm.index" placeholder="Skill Name" /> </el-form-item>
-					</el-col>
-					<el-col :span="12">
-						<el-form-item label="Color"> <el-input v-model="itemForm.color" placeholder="Skill score" /> </el-form-item>
+						<el-form-item label="Subtitle"> <el-select v-model="itemForm.value" placeholder="dict Subtitle"></el-select> </el-form-item>
 					</el-col>
 				</el-row>
 			</el-form>
@@ -79,27 +67,32 @@
 </template>
 
 <script lang="ts">
-import { createSkill, deleteSkill, getSkillsList, updateSkill } from '@/api/skills';
+import { createDict, deleteDict, getDictContent, getDictList, updateDict } from '@/api/dict';
 import { paginationConfig } from '@/const';
 import { dialogType } from '@/enum';
-import { queryForm, skill } from '@/type';
+import { dict, queryForm } from '@/type';
 import { ArrowLeft, ArrowRight, Delete, Edit, InfoFilled, Plus, Refresh } from '@element-plus/icons-vue';
 import { defineComponent, reactive, ref } from '@vue/runtime-core';
 import { ElMessage, ElMessageBox } from 'element-plus';
 
 export default defineComponent({
-	name: 'view_Skills',
+	name: 'view_Dict',
 	setup() {
 		let query = reactive<queryForm>({ pageSize: paginationConfig.pageSize, pageNum: paginationConfig.pageNum });
-		let itemForm = reactive<skill>({ name: '', score: 0, index: 0, color: '' });
+		let itemForm = reactive<dict>({
+			key: 0,
+			index: 0,
+			label: '',
+			desc: '',
+		});
 		let dialogVisible = ref(false);
-		let skillList = reactive<Array<skill>>([]);
+		let dictList = reactive<Array<dict>>([]);
 		let dialogTitle = ref('');
 		let isNextPageDisabled = ref<boolean>(false);
 		let dialogType = ref(0);
 		return {
 			query,
-			skillList,
+			dictList,
 			itemForm,
 			dialogVisible,
 			dialogTitle,
@@ -138,18 +131,18 @@ export default defineComponent({
 		this.handleQuery();
 	},
 	methods: {
-		setItemValue(item: skill) {
-			this.itemForm.name = item.name;
-			this.itemForm.score = item.score;
-			this.itemForm.index = item.index;
-			this.itemForm.color = item.color;
+		setItemValue(item: dict) {
 			this.itemForm._id = item._id;
+			this.itemForm.key = item.key;
+			this.itemForm.index = item.index;
+			this.itemForm.value = item.value;
+			this.itemForm.label = item.label;
 		},
 		handleQuery() {
-			getSkillsList(this.query)
+			getDictList(this.query)
 				.then((res) => {
-					this.skillList = res;
-					this.isNextPageDisabled = this.skillList.length < this.query.pageSize;
+					this.dictList = res;
+					this.isNextPageDisabled = this.dictList.length < this.query.pageSize;
 					this.$forceUpdate();
 				})
 				.catch((err) => {
@@ -159,27 +152,33 @@ export default defineComponent({
 		handleCreate() {
 			this.dialogType = dialogType.create;
 			this.setItemValue({
-				name: '',
-				score: 0,
+				key: 0,
 				index: 0,
-				color: '',
+				label: '',
+				desc: '',
 			});
 			this.dialogVisible = true;
 		},
-		handleDetail(item: skill) {
-			this.dialogType = dialogType.detail;
-			this.dialogVisible = true;
-			this.setItemValue(item);
+		handleDetail(item: dict) {
+			getDictContent(item._id as string)
+				.then((res) => {
+					this.dialogType = dialogType.detail;
+					this.dialogVisible = true;
+					this.setItemValue(res);
+				})
+				.catch((err) => {
+					console.log(err);
+				});
 		},
-		handleEdit(item: skill) {
+		handleEdit(item: dict) {
 			this.dialogType = dialogType.edit;
-			this.dialogVisible = true;
 			this.setItemValue(item);
+			this.dialogVisible = true;
 		},
-		handleDelete(item: skill) {
-			ElMessageBox.confirm(`Are you sure to delete ${item.name} ?`)
+		handleDelete(item: dict) {
+			ElMessageBox.confirm(`Are you sure to delete ${item.label} ?`)
 				.then(() => {
-					deleteSkill(item._id as string)
+					deleteDict(item._id as string)
 						.then((res) => {
 							ElMessage({
 								message: 'Deleted Successfully!',
@@ -207,9 +206,8 @@ export default defineComponent({
 			switch (this.dialogType) {
 				case dialogType.create:
 					delete this.itemForm._id;
-					delete this.itemForm._id;
-					createSkill(this.itemForm)
-						.then((res) => {
+					createDict(this.itemForm)
+						.then(() => {
 							this.dialogVisible = false;
 							ElMessage({
 								message: 'Updated Successfully!',
@@ -222,8 +220,8 @@ export default defineComponent({
 						});
 					break;
 				case dialogType.edit:
-					updateSkill(this.itemForm._id as string, this.itemForm)
-						.then((res) => {
+					updateDict(this.itemForm._id as string, this.itemForm)
+						.then(() => {
 							this.dialogVisible = false;
 							ElMessage({
 								message: 'Created Successfully!',

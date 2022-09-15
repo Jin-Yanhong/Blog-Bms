@@ -1,8 +1,8 @@
 <template>
 	<div class="sidebar">
 		<!-- :default-active="currentRouter" -->
-		<el-menu :background-color="bgColor" active-text-color="#ffd04b" class="el-menu-vertical-demo" text-color="#fff" mode="vertical" @open="handleOpen" @close="handleClose">
-			<SidebarItem v-for="route in routerList" :item="route" />
+		<el-menu :default-active="activeMenu" :unique-opened="false" :collapse-transition="true" :collapse="false" :background-color="bgColor" active-text-color="#ffd04b" class="el-menu-vertical-demo" text-color="#fff" mode="vertical">
+			<SidebarItem v-for="route in routerList" :item="route" :basePath="route.path" />
 		</el-menu>
 	</div>
 </template>
@@ -10,18 +10,16 @@
 <script lang="ts">
 import { routes } from '@/router';
 import { Document, Menu as IconMenu, Setting } from '@element-plus/icons-vue';
-import { defineComponent, ref } from '@vue/runtime-core';
+import { defineComponent } from '@vue/runtime-core';
 import SidebarItem from './SidebarItem.vue';
 
 export default defineComponent({
 	setup() {
 		const routerList = routes;
-		let currentRouter = ref('/dashboard');
 		const bgColor = '#545c64';
 		return {
 			bgColor,
 			routerList,
-			currentRouter,
 		};
 	},
 	name: 'Side_bar',
@@ -31,12 +29,12 @@ export default defineComponent({
 		Setting,
 		SidebarItem,
 	},
-	methods: {
-		handleOpen: (key: string, keyPath: string[]) => {},
-		handleClose: (key: string, keyPath: string[]) => {},
-	},
-	watch: {
-		$route: function (nVal, oVal) {},
+	computed: {
+		activeMenu(): string {
+			const route = this.$route;
+			const path = route.path;
+			return path;
+		},
 	},
 });
 </script>

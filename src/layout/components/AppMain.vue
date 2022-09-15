@@ -3,6 +3,7 @@
 		<Sidebar class="sidebar" />
 		<Navbar class="navbar" />
 		<router-view class="appView" />
+		<!-- <keep-alive></keep-alive> -->
 	</div>
 </template>
 

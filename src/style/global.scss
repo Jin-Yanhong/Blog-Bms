@@ -1,6 +1,13 @@
-@import "./variables.scss";
+@import './variables.scss';
 
 .view {
-    padding: 12px;
-    background: #ececec;
+	padding: 12px;
+	background: #ececec;
+}
+
+a {
+	text-decoration: none;
+	:focus {
+		color: #fff;
+	}
 }

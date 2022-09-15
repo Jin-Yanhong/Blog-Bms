@@ -1,24 +1,17 @@
 <template>
 	<template v-if="item.children">
-		<ElSubMenu v-if="item.children.length > 1" :index="item.path">
+		<ElSubMenu :index="fatherPath + '/' + item.path">
 			<template v-slot:title>
 				<span>
 					<slot name="title"> {{ item.meta.title }} </slot>
 				</span>
 			</template>
-			<SidebarItem v-for="child in item.children" :item="child" />
+			<SidebarItem v-for="child in item.children" :item="child" :basePath="fatherPath" />
 		</ElSubMenu>
-		<ElMenuItem v-else :index="item.path" @click="menuClick(item)">
-			<span>
-				{{ item.meta.title }}
-			</span>
-		</ElMenuItem>
 	</template>
 	<template v-else>
-		<ElMenuItem v-if="item.meta.show" :index="item.path" @click="menuClick(item)">
-			<span>
-				{{ item.meta.title }}
-			</span>
+		<ElMenuItem v-if="item.meta.show" :index="fatherPath + '/' + item.path" @click="menuClick(item)">
+			<span> {{ item.meta.title }} </span>
 		</ElMenuItem>
 	</template>
 </template>
@@ -27,16 +20,17 @@
 import { defineComponent } from '@vue/runtime-core';
 import { ElMenuItem, ElSubMenu } from 'element-plus';
 import { RouteRecordRaw } from 'vue-router';
-
 export default defineComponent({
 	setup(props: any) {
-		let { item } = props;
+		let { item, basePath: fatherPath } = props;
 		return {
 			item,
+			fatherPath,
 		};
 	},
 	props: {
 		item: { type: Object, required: true },
+		basePath: { type: String, required: true },
 	},
 	name: 'SidebarItem',
 	components: {
@@ -44,8 +38,9 @@ export default defineComponent({
 		ElMenuItem,
 	},
 	methods: {
-		menuClick(menuItem: RouteRecordRaw) {
-			this.$router.push(menuItem.path);
+		menuClick(item: RouteRecordRaw) {
+			let path = this.fatherPath + '/' + item.path;
+			this.$router.push(path);
 		},
 	},
 });
