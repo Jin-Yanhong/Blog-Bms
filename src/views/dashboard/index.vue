@@ -10,10 +10,41 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/runtime-core';
+import { defineComponent, nextTick, ref } from '@vue/runtime-core';
+import { ElInput } from 'element-plus';
 
 export default defineComponent({
 	name: 'view_dashboard',
+	setup(props, ctx) {
+		const inputValue = ref('');
+		const dynamicTags = ref(['Tag 1', 'Tag 2', 'Tag 3']);
+		const inputVisible = ref(false);
+		const InputRef = ref<InstanceType<typeof ElInput>>();
+		return {
+			inputValue,
+			dynamicTags,
+			inputVisible,
+			InputRef,
+		};
+	},
+	methods: {
+		handleClose(tag: string) {
+			this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
+		},
+		showInput() {
+			this.inputVisible = true;
+			nextTick(() => {
+				this.InputRef!.input!.focus();
+			});
+		},
+		handleInputConfirm() {
+			if (this.inputValue) {
+				this.dynamicTags.push(this.inputValue);
+			}
+			this.inputVisible = false;
+			this.inputValue = '';
+		},
+	},
 });
 </script>
 <style lang="scss" scoped>

@@ -1,3 +1,8 @@
+export interface loginForm {
+    password: string;
+    user_name: string;
+}
+
 export interface queryForm {
     name?: string;
     type?: string;
@@ -32,16 +37,18 @@ export interface work {
     _id?: string;
 }
 
-export interface dict {
+export interface dictKey {
     key: number;
     index: number;
     desc: string;
     label: string;
-    value?: Array<string>;
+    value?: Array<dictValue>;
     _id?: string;
 }
-
-export interface dictData {
+export interface dictValueList {
+    value: Array<dictValue>;
+}
+export interface dictValue {
     label: string;
     value: number;
 }

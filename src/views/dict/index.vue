@@ -15,8 +15,8 @@
 		</div>
 
 		<!--  -->
-		<el-table :data="dictList" class="listTable">
-			<el-table-column prop="index" label="Index" align="center" width="60" />
+		<el-table :data="dictList" class="listTable" border>
+			<el-table-column prop="index" label="Index" align="center" width="70" />
 			<el-table-column prop="label" label="Label" align="center" width="300" />
 			<el-table-column prop="key" label="Key" align="center" width="60" />
 			<el-table-column prop="desc" label="Description" align="center" />
@@ -48,12 +48,36 @@
 			<el-form :model="itemForm" class="demo-form-inline" label-position="top">
 				<el-row :gutter="10">
 					<el-col :span="12">
-						<el-form-item label="Title"> <el-input v-model="itemForm.label" placeholder="dict Title" /> </el-form-item>
+						<el-form-item label="Label"> <el-input v-model="itemForm.label" placeholder="Dict Title" /> </el-form-item>
 					</el-col>
 					<el-col :span="12">
-						<el-form-item label="Subtitle"> <el-select v-model="itemForm.value" placeholder="dict Subtitle"></el-select> </el-form-item>
+						<el-form-item label="Index"> <el-input v-model="itemForm.index" placeholder="Dict Subtitle"></el-input> </el-form-item>
 					</el-col>
 				</el-row>
+				<el-row :gutter="10">
+					<el-col :span="12">
+						<el-form-item label="Key"> <el-input v-model="itemForm.key" placeholder="Dict Key" /> </el-form-item>
+					</el-col>
+					<el-col :span="12">
+						<el-form-item label="Desc"> <el-input v-model="itemForm.desc" placeholder="Dict Subtitle"></el-input> </el-form-item>
+					</el-col>
+				</el-row>
+				<span class="el-form-item__label"> Value </span>
+				<div class="valueContainer">
+					<p class="flex felx-center" v-for="tag in itemForm.value" :key="tag.value">
+						<span style="flex-grow: 2"> <el-input v-model="tag.label"></el-input> </span>
+						<span style="flex-grow: 2"><el-input readonly v-model="tag.value"></el-input></span>
+						<span>
+							<el-button type="danger" @click="handleTagDelete(tag)">
+								<el-icon><Delete /></el-icon>
+							</el-button>
+						</span>
+					</p>
+					<p>
+						<el-input v-if="inputVisible" ref="InputRef" v-model="inputValue" class="ml-1 w-20" @keyup.enter="handleInputConfirm" @blur="handleInputConfirm" />
+						<el-button v-else class="button-new-tag ml-1" @click="showInput"> + Add New Tag </el-button>
+					</p>
+				</div>
 			</el-form>
 
 			<template #footer>
@@ -70,26 +94,31 @@
 import { createDict, deleteDict, getDictContent, getDictList, updateDict } from '@/api/dict';
 import { paginationConfig } from '@/const';
 import { dialogType } from '@/enum';
-import { dict, queryForm } from '@/type';
+import { dictKey, dictValue, queryForm } from '@/type';
 import { ArrowLeft, ArrowRight, Delete, Edit, InfoFilled, Plus, Refresh } from '@element-plus/icons-vue';
-import { defineComponent, reactive, ref } from '@vue/runtime-core';
-import { ElMessage, ElMessageBox } from 'element-plus';
-
+import { defineComponent, nextTick, reactive, ref } from '@vue/runtime-core';
+import { ElInput, ElMessage, ElMessageBox } from 'element-plus';
 export default defineComponent({
 	name: 'view_Dict',
 	setup() {
 		let query = reactive<queryForm>({ pageSize: paginationConfig.pageSize, pageNum: paginationConfig.pageNum });
-		let itemForm = reactive<dict>({
+		let itemForm = reactive<dictKey>({
 			key: 0,
 			index: 0,
 			label: '',
 			desc: '',
+			value: [],
 		});
+		const inputValue = ref('');
+		const inputVisible = ref(false);
+		const InputRef = ref<InstanceType<typeof ElInput>>();
+
 		let dialogVisible = ref(false);
-		let dictList = reactive<Array<dict>>([]);
+		let dictList = reactive<Array<dictValue>>([]);
 		let dialogTitle = ref('');
 		let isNextPageDisabled = ref<boolean>(false);
 		let dialogType = ref(0);
+
 		return {
 			query,
 			dictList,
@@ -98,6 +127,9 @@ export default defineComponent({
 			dialogTitle,
 			dialogType,
 			isNextPageDisabled,
+			inputValue,
+			inputVisible,
+			InputRef,
 		};
 	},
 	components: {
@@ -110,7 +142,7 @@ export default defineComponent({
 		Delete,
 	},
 	watch: {
-		dialogType: function (nVal, oVal) {
+		dialogType: function (nVal) {
 			switch (nVal) {
 				case dialogType.create:
 					this.dialogTitle = 'Create';
@@ -131,12 +163,13 @@ export default defineComponent({
 		this.handleQuery();
 	},
 	methods: {
-		setItemValue(item: dict) {
+		setItemValue(item: dictKey) {
 			this.itemForm._id = item._id;
 			this.itemForm.key = item.key;
 			this.itemForm.index = item.index;
-			this.itemForm.value = item.value;
 			this.itemForm.label = item.label;
+			this.itemForm.desc = item.desc;
+			this.itemForm.value = item.value;
 		},
 		handleQuery() {
 			getDictList(this.query)
@@ -156,26 +189,35 @@ export default defineComponent({
 				index: 0,
 				label: '',
 				desc: '',
+				value: [],
 			});
 			this.dialogVisible = true;
 		},
-		handleDetail(item: dict) {
+		handleDetail(item: dictKey) {
+			this.setItemValue(item);
 			getDictContent(item._id as string)
 				.then((res) => {
 					this.dialogType = dialogType.detail;
 					this.dialogVisible = true;
-					this.setItemValue(res);
+					this.itemForm.value = res.value;
 				})
 				.catch((err) => {
 					console.log(err);
 				});
 		},
-		handleEdit(item: dict) {
-			this.dialogType = dialogType.edit;
+		handleEdit(item: dictKey) {
 			this.setItemValue(item);
-			this.dialogVisible = true;
+			getDictContent(item._id as string)
+				.then((res) => {
+					this.dialogType = dialogType.edit;
+					this.dialogVisible = true;
+					this.itemForm.value = res.value;
+				})
+				.catch((err) => {
+					console.log(err);
+				});
 		},
-		handleDelete(item: dict) {
+		handleDelete(item: dictKey) {
 			ElMessageBox.confirm(`Are you sure to delete ${item.label} ?`)
 				.then(() => {
 					deleteDict(item._id as string)
@@ -241,6 +283,26 @@ export default defineComponent({
 					break;
 			}
 		},
+		handleTagDelete(tag: dictValue) {
+			this.itemForm.value?.splice(this.itemForm.value?.indexOf(tag), 1);
+			console.dir(this.itemForm.value);
+		},
+		showInput() {
+			this.inputVisible = true;
+			nextTick(() => {
+				this.InputRef!.input!.focus();
+			});
+		},
+		handleInputConfirm() {
+			if (this.inputValue) {
+				this.itemForm?.value?.push({
+					label: this.inputValue,
+					value: this.itemForm?.value?.length + 1,
+				});
+			}
+			this.inputVisible = false;
+			this.inputValue = '';
+		},
 	},
 });
 </script>
@@ -265,6 +327,24 @@ export default defineComponent({
 	}
 }
 
+.valueContainer {
+	max-height: 300px;
+	overflow-y: auto;
+	border-radius: 4px;
+	border: 1px solid var(--el-border-color);
+	p {
+		padding: 10px;
+		width: calc(100% - 22px);
+		& > span {
+			margin: 0 4px;
+		}
+		&:nth-last-child(1) {
+			/* 偶数 */
+			margin: 0;
+			border-top: 1px solid var(--el-border-color);
+		}
+	}
+}
 .Pager {
 	margin: 20px 0;
 	float: right;

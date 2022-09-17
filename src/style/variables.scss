@@ -1,1 +1,38 @@
 $border-color: var(--el-menu-border-color);
+// 默认背景色
+$defaultBg: #ecf0f1;
+
+// 主题色
+$themeColor: #2b67cc;
+
+// 默认边线的颜色
+$lineColor: #636363;
+
+$enFont: 'Oswald-Regular';
+
+$itemSpace: 12px;
+
+$linkTextColor: #dcdde1;
+
+$linkTextHoverColor: #fff;
+
+@mixin borderRadius {
+	border-radius: 4px;
+}
+@mixin marginBtm {
+	margin-bottom: 80px;
+}
+
+@mixin boxShadow {
+	box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px;
+}
+
+@mixin paddingTB {
+	padding: {
+		top: 12px;
+		bottom: 12px;
+	}
+}
+
+// TODO:
+// .enFont-*

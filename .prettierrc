@@ -18,7 +18,7 @@
 				"quoteProps": "as-needed",
 				"singleQuote": true,
 				"bracketSpacing": true,
-				"bracketSameLine": true,
+				"bracketSameLine": false,
 				"printWidth": 360
 			}
 		}

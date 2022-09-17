@@ -1,5 +1,12 @@
 import AppMain from '@/layout/components/AppMain.vue';
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import { useUserStore } from '@/store/user';
+import { ElMessage } from 'element-plus';
+import NProgress from 'nprogress';
+import { createRouter, createWebHistory, RouteLocationNormalized, RouteRecordRaw } from 'vue-router';
+
+import 'nprogress/nprogress.css';
+
+const whiteList = ['/login'];
 
 export const routes: Array<RouteRecordRaw> = [
     {
@@ -123,4 +130,35 @@ const router = createRouter({
     routes,
 });
 
+router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalized, next) => {
+    NProgress.start();
+    if (useUserStore().token) {
+        if (to.path === '/login') {
+            next({ path: '/' });
+            NProgress.done();
+        } else {
+            try {
+                next();
+            } catch (err: any) {
+                useUserStore().handleLogout();
+                ElMessage.error(err.message || 'Has Error');
+                next(`/login`);
+                NProgress.done();
+            }
+        }
+    } else {
+        if (whiteList.indexOf(to.path) !== -1) {
+            next();
+        } else {
+            next('/login');
+            NProgress.done();
+        }
+    }
+});
+
+router.afterEach((to: RouteLocationNormalized) => {
+    NProgress.done();
+
+    document.title = 'BMS' + ' | ' + to.meta?.title;
+});
 export default router;

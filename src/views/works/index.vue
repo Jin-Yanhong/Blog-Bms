@@ -21,12 +21,12 @@
 			<el-table-column prop="desc" label="Description" align="center" />
 			<el-table-column prop="technology" label="Technology" align="center">
 				<template #default="scope">
-					<el-tag size="small" v-for="item in scope.row.technology" effect="dark">{{ item }}</el-tag>
+					<el-tag size="small" v-for="item in scope.row.technology" effect="dark">{{ fieldTranslate(workItem.techList, item, 'value', 'label') }}</el-tag>
 				</template>
 			</el-table-column>
 			<el-table-column prop="tag" label="Tag" align="center">
 				<template #default="scope">
-					<el-tag size="small" v-for="item in scope.row.tag" type="success" effect="dark">{{ item }}</el-tag>
+					<el-tag size="small" v-for="item in scope.row.tag" type="success" effect="dark">{{ fieldTranslate(workItem.tagList, item, 'value', 'label') }}</el-tag>
 				</template>
 			</el-table-column>
 			<el-table-column label="Operations" width="260" align="center">
@@ -65,10 +65,18 @@
 				</el-row>
 				<el-row :gutter="10">
 					<el-col :span="12">
-						<el-form-item label="Tag"> <el-select v-model="itemForm.tag" placeholder="Work Tag"></el-select> </el-form-item>
+						<el-form-item label="Tag">
+							<el-select v-model="itemForm.tag" placeholder="Work Tag" :multiple="true">
+								<el-option v-for="tag in workItem.tagList" :key="tag.value" :value="tag.value" :label="tag.label"></el-option>
+							</el-select>
+						</el-form-item>
 					</el-col>
 					<el-col :span="12">
-						<el-form-item label="Technology"> <el-select v-model="itemForm.technology" placeholder="Work Technology"></el-select> </el-form-item>
+						<el-form-item label="Technology">
+							<el-select v-model="itemForm.technology" placeholder="Work Technology" :multiple="true">
+								<el-option v-for="tech in workItem.techList" :key="tech.value" :value="tech.value" :label="tech.label"></el-option>
+							</el-select>
+						</el-form-item>
 					</el-col>
 				</el-row>
 				<el-row :gutter="10">
@@ -92,7 +100,9 @@
 import { createWork, deleteWork, getWorkList, updateWork } from '@/api/work';
 import { paginationConfig } from '@/const';
 import { dialogType } from '@/enum';
-import { queryForm, work } from '@/type';
+import { dictValue, queryForm, work } from '@/type';
+import { useDict } from '@/utils';
+import { fieldTranslate } from '@/utils/index';
 import { ArrowLeft, ArrowRight, Delete, Edit, InfoFilled, Plus, Refresh } from '@element-plus/icons-vue';
 import { defineComponent, reactive, ref } from '@vue/runtime-core';
 import { ElMessage, ElMessageBox } from 'element-plus';
@@ -100,6 +110,10 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 export default defineComponent({
 	name: 'view_Works',
 	setup() {
+		interface workDict {
+			tagList: dictValue[];
+			techList: dictValue[];
+		}
 		let query = reactive<queryForm>({ pageSize: paginationConfig.pageSize, pageNum: paginationConfig.pageNum });
 		let itemForm = reactive<work>({
 			name: '',
@@ -108,6 +122,11 @@ export default defineComponent({
 			technology: [],
 			screenShortUrl: '',
 		});
+		let workItem = reactive<workDict>({
+			tagList: [],
+			techList: [],
+		});
+
 		let dialogVisible = ref(false);
 		let workList = reactive<Array<work>>([]);
 		let dialogTitle = ref('');
@@ -118,6 +137,7 @@ export default defineComponent({
 			workList,
 			itemForm,
 			dialogVisible,
+			workItem,
 			dialogTitle,
 			dialogType,
 			isNextPageDisabled,
@@ -152,6 +172,14 @@ export default defineComponent({
 	},
 	created() {
 		this.handleQuery();
+		// 技术栈字典
+		useDict(1).then((dict) => {
+			this.workItem.techList = dict.value;
+		});
+		// 应用标签
+		useDict(2).then((dict) => {
+			this.workItem.tagList = dict.value;
+		});
 	},
 	methods: {
 		setItemValue(item: work) {
@@ -192,6 +220,7 @@ export default defineComponent({
 			this.dialogType = dialogType.edit;
 			this.dialogVisible = true;
 			this.setItemValue(item);
+			this.itemForm._id = item._id;
 		},
 		handleDelete(item: work) {
 			ElMessageBox.confirm(`Are you sure to delete ${item.name} ?`)
@@ -259,6 +288,7 @@ export default defineComponent({
 					break;
 			}
 		},
+		fieldTranslate,
 	},
 });
 </script>

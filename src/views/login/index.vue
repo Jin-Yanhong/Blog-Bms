@@ -9,10 +9,10 @@
 						</div>
 					</template>
 					<el-form :model="form" :label-width="labelWidth" label-position="left" ref="loginFormRef" :rules="rules">
-						<el-form-item label="user name" prop="userName" required>
-							<el-input v-model="form.userName" placeholder="your user name" />
+						<el-form-item label="User Name" prop="user_name" required>
+							<el-input v-model="form.user_name" placeholder="your user name" />
 						</el-form-item>
-						<el-form-item label="user password" prop="password" required>
+						<el-form-item label="User Password" prop="password" required>
 							<el-input type="password" v-model="form.password" placeholder="password" />
 						</el-form-item>
 						<el-form-item>
@@ -27,25 +27,22 @@
 
 <script lang="ts">
 import route from '@/router';
+import { useUserStore } from '@/store/user';
+import { loginForm } from '@/type';
 import { defineComponent, reactive, ref } from '@vue/runtime-core';
 import type { FormInstance, FormRules } from 'element-plus';
-interface loginForm {
-	userName: string;
-	password: string;
-}
 
 export default defineComponent({
 	setup() {
 		let form = reactive<loginForm>({
-			userName: '',
 			password: '',
+			user_name: '',
 		});
-		let labelWidth = ref('120px');
-
+		const user = useUserStore();
+		let labelWidth = ref('140px');
 		const loginFormRef = ref<FormInstance>();
-
 		const rules = reactive<FormRules>({
-			userName: [
+			user_name: [
 				{
 					required: true,
 					message: 'Please input user name',
@@ -66,19 +63,19 @@ export default defineComponent({
 			rules,
 			labelWidth,
 			loginFormRef,
+			user,
 		};
 	},
 	name: 'view_Login',
 	methods: {
-		onSubmit: async (formEl: FormInstance | undefined) => {
+		onSubmit: async function (formEl: FormInstance | undefined) {
 			if (!formEl) return;
 			await formEl.validate((valid, fields) => {
 				if (valid) {
-					// TODO: login Api
-					// console.log("submit!");
-					route.replace('/');
-				} else {
-					console.log('error submit!', fields);
+					this.user.handleLogin(this.form);
+					setTimeout(() => {
+						route.replace('/');
+					}, 200);
 				}
 			});
 		},

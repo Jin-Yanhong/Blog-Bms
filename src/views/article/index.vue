@@ -128,7 +128,7 @@ export default defineComponent({
 		Delete,
 	},
 	watch: {
-		dialogType: function (nVal, oVal) {
+		dialogType: function (nVal) {
 			switch (nVal) {
 				case dialogType.create:
 					this.dialogTitle = 'Create';
@@ -195,15 +195,22 @@ export default defineComponent({
 				});
 		},
 		handleEdit(item: article) {
-			this.dialogType = dialogType.edit;
-			this.dialogVisible = true;
-			this.setItemValue(item);
+			getArticleContent(item._id as string)
+				.then((res) => {
+					this.dialogType = dialogType.edit;
+					this.dialogVisible = true;
+					this.setItemValue(res);
+					this.itemForm._id = item._id;
+				})
+				.catch((err) => {
+					console.log(err);
+				});
 		},
 		handleDelete(item: article) {
 			ElMessageBox.confirm(`Are you sure to delete ${item.title} ?`)
 				.then(() => {
 					deleteArticle(item._id as string)
-						.then((res) => {
+						.then(() => {
 							ElMessage({
 								message: 'Deleted Successfully!',
 								type: 'success',
@@ -214,8 +221,8 @@ export default defineComponent({
 							console.log(err);
 						});
 				})
-				.catch(() => {
-					// catch error
+				.catch((err) => {
+					console.log(err);
 				});
 		},
 		PrevPage() {
@@ -229,7 +236,6 @@ export default defineComponent({
 		onItemSubmit() {
 			switch (this.dialogType) {
 				case dialogType.create:
-					delete this.itemForm._id;
 					createArticle(this.itemForm)
 						.then(() => {
 							this.dialogVisible = false;
@@ -256,6 +262,7 @@ export default defineComponent({
 						.catch((err) => {
 							console.log(err);
 						});
+
 					break;
 				case dialogType.detail:
 					this.dialogVisible = false;

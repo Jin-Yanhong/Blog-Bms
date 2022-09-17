@@ -1,8 +1,8 @@
-import { dict, queryForm } from '@/type';
+import { dictKey, queryForm } from '@/type';
 import request from '@/utils/request';
 
 // 创建字典
-export function createDict(doc: dict): Promise<any> {
+export function createDict(doc: dictKey): Promise<any> {
     return request({
         url: 'dict/createDict',
         method: 'put',
@@ -29,7 +29,7 @@ export function getDictContent(id: string): Promise<any> {
 }
 
 // 字典更新
-export function updateDict(id: string, doc: dict): Promise<any> {
+export function updateDict(id: string, doc: dictKey): Promise<any> {
     return request({
         url: 'dict/updateDict/' + id,
         method: 'post',
@@ -44,5 +44,12 @@ export function deleteDict(id: string): Promise<any> {
     return request({
         url: 'dict/deletDict/' + id,
         method: 'delete',
+    });
+}
+// 字典删除
+export function useDictByKey(key: number): Promise<any> {
+    return request({
+        url: 'dict/useDict/' + key,
+        method: 'get',
     });
 }
