@@ -63,6 +63,7 @@ export function setStorage(key: string, value: any): void {
     let str = JSON.stringify(value);
     window.sessionStorage.setItem(key, str);
 }
+
 export function clearStorage(): void {
     window.sessionStorage.clear();
 }

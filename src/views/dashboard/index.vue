@@ -1,50 +1,34 @@
 <template>
 	<div class="view">
 		<div class="box">
-			<div class="one">1</div>
-			<div class="two">2</div>
-			<div class="three">3</div>
-			<div class="four">4</div>
+			<div class="one"><BarChart /></div>
+			<div class="two"><LineChart /></div>
+			<div class="three"><MixedChart /></div>
+			<div class="four"><PieChart /></div>
 		</div>
 	</div>
 </template>
 
 <script lang="ts">
-import { defineComponent, nextTick, ref } from '@vue/runtime-core';
-import { ElInput } from 'element-plus';
+import BarChart from '@/components/Charts/BarChart.vue';
+import LineChart from '@/components/Charts/LineChart.vue';
+import MixedChart from '@/components/Charts/MixedChart.vue';
+import PieChart from '@/components/Charts/PieChart.vue';
+import { defineComponent } from '@vue/runtime-core';
+import {} from 'echarts';
 
 export default defineComponent({
 	name: 'view_dashboard',
 	setup(props, ctx) {
-		const inputValue = ref('');
-		const dynamicTags = ref(['Tag 1', 'Tag 2', 'Tag 3']);
-		const inputVisible = ref(false);
-		const InputRef = ref<InstanceType<typeof ElInput>>();
-		return {
-			inputValue,
-			dynamicTags,
-			inputVisible,
-			InputRef,
-		};
+		return {};
 	},
-	methods: {
-		handleClose(tag: string) {
-			this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
-		},
-		showInput() {
-			this.inputVisible = true;
-			nextTick(() => {
-				this.InputRef!.input!.focus();
-			});
-		},
-		handleInputConfirm() {
-			if (this.inputValue) {
-				this.dynamicTags.push(this.inputValue);
-			}
-			this.inputVisible = false;
-			this.inputValue = '';
-		},
+	components: {
+		BarChart,
+		LineChart,
+		MixedChart,
+		PieChart,
 	},
+	methods: {},
 });
 </script>
 <style lang="scss" scoped>

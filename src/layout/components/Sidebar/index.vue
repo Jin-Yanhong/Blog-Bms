@@ -1,6 +1,6 @@
 <template>
 	<div class="sidebar">
-		<el-menu :default-active="activeMenu" :unique-opened="false" :collapse-transition="true" :collapse="false" :background-color="bgColor" active-text-color="#ffd04b" class="el-menu-vertical-demo" text-color="#fff" mode="vertical">
+		<el-menu :default-active="activeMenu" :unique-opened="true" :collapse-transition="true" :collapse="false" :background-color="bgColor" active-text-color="#ffd04b" class="el-menu-vertical-demo" text-color="#fff" mode="vertical">
 			<SidebarItem v-for="route in routerList" :item="route" :basePath="route.path" />
 		</el-menu>
 	</div>

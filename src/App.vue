@@ -15,7 +15,13 @@ export default defineComponent({
 			user,
 		};
 	},
-	created() {},
+	created() {
+		let _this = this;
+		window.onclose = function () {
+			_this.user.handleLogout();
+			clearStorage();
+		};
+	},
 	beforeDestroy() {
 		clearStorage();
 	},
