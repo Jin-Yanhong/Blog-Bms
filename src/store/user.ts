@@ -1,6 +1,6 @@
 import { login } from '@/api/user';
 import { loginForm } from '@/type';
-import { getStorage, setStorage } from '@/utils/index';
+import { clearStorage, getStorage, setStorage } from '@/utils/index';
 import { defineStore } from 'pinia';
 
 export const useUserStore = defineStore({
@@ -18,18 +18,20 @@ export const useUserStore = defineStore({
             this.$patch({
                 token: '',
             });
+            clearStorage();
         },
         async handleLogin(loginForm: loginForm) {
             try {
                 let { accessToken = '' } = await login(loginForm);
-                setStorage('token', accessToken),
-                    this.$patch({
-                        token: accessToken,
-                    });
+                setStorage('token', accessToken);
+                this.$patch({
+                    token: accessToken,
+                });
             } catch (error: any) {
                 this.$patch({
                     token: '',
                 });
+                clearStorage();
             }
         },
     },

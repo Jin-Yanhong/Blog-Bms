@@ -15,28 +15,28 @@ export const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/login/index.vue'),
         meta: {
             title: '登录',
-            icon: 'login',
             cache: true,
             show: false,
         },
     },
     {
-        path: '/dashboard',
-        name: 'dashboard',
+        path: '/',
+        redirect: '/dashboard',
+        name: 'root',
         component: AppMain,
         meta: {
             title: '系统概要',
-            icon: 'dashboard',
+            icon: 'Odometer',
             cache: true,
             show: true,
         },
         children: [
             {
-                path: '',
+                path: 'dashboard',
                 name: 'dashboard',
                 meta: {
                     title: '总览',
-                    icon: 'dashboard',
+                    icon: 'PieChart',
                     cache: true,
                     show: true,
                 },
@@ -50,7 +50,7 @@ export const routes: Array<RouteRecordRaw> = [
         component: AppMain,
         meta: {
             title: '系统管理',
-            icon: 'dict',
+            icon: 'Setting',
             cache: true,
             show: false,
         },
@@ -60,7 +60,7 @@ export const routes: Array<RouteRecordRaw> = [
                 name: 'dict',
                 meta: {
                     title: '字典管理',
-                    icon: 'dict',
+                    icon: 'Notebook',
                     cache: true,
                     show: true,
                 },
@@ -70,12 +70,12 @@ export const routes: Array<RouteRecordRaw> = [
     },
     {
         path: '/content',
-        name: 'appMain',
+        name: 'content',
         redirect: '/dashboard',
         component: AppMain,
         meta: {
             title: '内容管理',
-            icon: '',
+            icon: 'Collection',
             cache: true,
             show: false,
         },
@@ -86,7 +86,7 @@ export const routes: Array<RouteRecordRaw> = [
                 component: () => import('@/views/article/index.vue'),
                 meta: {
                     title: '文章管理',
-                    icon: 'article',
+                    icon: 'Document',
                     cache: true,
                     show: true,
                 },
@@ -97,7 +97,7 @@ export const routes: Array<RouteRecordRaw> = [
                 component: () => import('@/views/skills/index.vue'),
                 meta: {
                     title: '技能管理',
-                    icon: 'skills',
+                    icon: 'Box',
                     cache: true,
                     show: true,
                 },
@@ -108,7 +108,7 @@ export const routes: Array<RouteRecordRaw> = [
                 component: () => import('@/views/works/index.vue'),
                 meta: {
                     title: '作品管理',
-                    icon: 'works',
+                    icon: 'Basketball',
                     cache: true,
                     show: true,
                 },
@@ -118,6 +118,7 @@ export const routes: Array<RouteRecordRaw> = [
     // 匹配不到页面返回 dashboard
     {
         path: '/:pathMatch(.*)*',
+        name: 'redirect',
         redirect: '/dashboard',
         meta: {
             show: false,

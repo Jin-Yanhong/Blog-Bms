@@ -1,6 +1,5 @@
 <template>
 	<div class="sidebar">
-		<!-- :default-active="currentRouter" -->
 		<el-menu :default-active="activeMenu" :unique-opened="false" :collapse-transition="true" :collapse="false" :background-color="bgColor" active-text-color="#ffd04b" class="el-menu-vertical-demo" text-color="#fff" mode="vertical">
 			<SidebarItem v-for="route in routerList" :item="route" :basePath="route.path" />
 		</el-menu>
@@ -9,14 +8,14 @@
 
 <script lang="ts">
 import { routes } from '@/router';
+import { memuBgColor } from '@/setting';
 import { Document, Menu as IconMenu, Setting } from '@element-plus/icons-vue';
 import { defineComponent } from '@vue/runtime-core';
 import SidebarItem from './SidebarItem.vue';
-
 export default defineComponent({
 	setup() {
 		const routerList = routes;
-		const bgColor = '#545c64';
+		const bgColor = memuBgColor;
 		return {
 			bgColor,
 			routerList,
