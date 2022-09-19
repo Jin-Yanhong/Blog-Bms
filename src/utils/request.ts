@@ -1,6 +1,7 @@
 import { useUserStore } from '@/store/user';
 import axios, { type AxiosRequestHeaders } from 'axios';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { failCode } from './constant';
 
 const service = axios.create({
     baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
@@ -10,47 +11,50 @@ const service = axios.create({
 
 // Request interceptors
 service.interceptors.request.use(
-    (config) => {
-        const customerHeaders: AxiosRequestHeaders = {
+    config => {
+        let customerHeaders: AxiosRequestHeaders = {
             'Content-Type': 'application/json;charset=utf-8',
-            accessToken: '',
         };
+        if (useUserStore().token) {
+            customerHeaders.accessToken = useUserStore().token;
+        }
         config.headers = Object.assign(config.headers ?? {}, customerHeaders);
         return config;
     },
-    (error) => {
+    error => {
         Promise.reject(error);
     }
 );
 
 // Response interceptors
 service.interceptors.response.use(
-    (response) => {
+    response => {
         const res = response.data;
-        if (res.code !== 200) {
+        const code = res.code;
+
+        if (code === failCode.userNotAuthorized) {
+            ElMessageBox.confirm('你已被登出，可以取消继续留在该页面，或者重新登录', '确定登出', {
+                confirmButtonText: '重新登录',
+                cancelButtonText: '取消',
+                type: 'warning',
+            }).then(() => {
+                useUserStore().handleLogout();
+                location.reload();
+            });
+            return Promise.reject(res.msg);
+        }
+        if (code !== failCode.success) {
             ElMessage({
-                message: res.msg || 'Error',
+                message: res.msg,
                 type: 'error',
                 duration: 5 * 1000,
             });
-            if (res.code === 403) {
-                ElMessageBox.confirm('你已被登出，可以取消继续留在该页面，或者重新登录', '确定登出', {
-                    confirmButtonText: '重新登录',
-                    cancelButtonText: '取消',
-                    type: 'warning',
-                }).then(() => {
-                    // user.handleLogout();
-                    useUserStore().handleLogout();
-
-                    location.reload(); // To prevent bugs from vue-router
-                });
-            }
-            return Promise.reject(new Error(res.message || 'Error'));
+            return Promise.reject(new Error(res.msg));
         } else {
             return response.data.data;
         }
     },
-    (error) => {
+    error => {
         ElMessage({
             message: error.message,
             type: 'error',

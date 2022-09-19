@@ -161,12 +161,12 @@ export default defineComponent({
 		},
 		handleQuery() {
 			getArticleList(this.query)
-				.then((res) => {
+				.then(res => {
 					this.articleList = res;
 					this.isNextPageDisabled = this.articleList.length < this.query.pageSize;
 					this.$forceUpdate();
 				})
-				.catch((err) => {
+				.catch(err => {
 					console.log(err);
 				});
 		},
@@ -185,24 +185,24 @@ export default defineComponent({
 		},
 		handleDetail(item: article) {
 			getArticleContent(item._id as string)
-				.then((res) => {
+				.then(res => {
 					this.dialogType = dialogType.detail;
 					this.dialogVisible = true;
 					this.setItemValue(res);
 				})
-				.catch((err) => {
+				.catch(err => {
 					console.log(err);
 				});
 		},
 		handleEdit(item: article) {
 			getArticleContent(item._id as string)
-				.then((res) => {
+				.then(res => {
 					this.dialogType = dialogType.edit;
 					this.dialogVisible = true;
 					this.setItemValue(res);
 					this.itemForm._id = item._id;
 				})
-				.catch((err) => {
+				.catch(err => {
 					console.log(err);
 				});
 		},
@@ -217,11 +217,11 @@ export default defineComponent({
 							});
 							this.handleQuery();
 						})
-						.catch((err) => {
+						.catch(err => {
 							console.log(err);
 						});
 				})
-				.catch((err) => {
+				.catch(err => {
 					console.log(err);
 				});
 		},
@@ -245,7 +245,7 @@ export default defineComponent({
 							});
 							this.handleQuery();
 						})
-						.catch((err) => {
+						.catch(err => {
 							console.log(err);
 						});
 					break;
@@ -259,7 +259,7 @@ export default defineComponent({
 							});
 							this.handleQuery();
 						})
-						.catch((err) => {
+						.catch(err => {
 							console.log(err);
 						});
 

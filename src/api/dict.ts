@@ -42,7 +42,7 @@ export function updateDict(id: string, doc: dictKey): Promise<any> {
 // 字典删除
 export function deleteDict(id: string): Promise<any> {
     return request({
-        url: 'dict/deletDict/' + id,
+        url: 'dict/deleteDict/' + id,
         method: 'delete',
     });
 }
