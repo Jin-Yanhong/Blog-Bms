@@ -46,7 +46,7 @@ export function getDate() {
 }
 
 export function getStorage(key: string): string {
-    let str: string = window.sessionStorage.getItem(key) ?? '';
+    let str: string = window.localStorage.getItem(key) ?? '';
     try {
         if (str) {
             return str;
@@ -61,9 +61,9 @@ export function getStorage(key: string): string {
 
 export function setStorage(key: string, value: any): void {
     let str = JSON.stringify(value);
-    window.sessionStorage.setItem(key, str);
+    window.localStorage.setItem(key, str);
 }
 
 export function clearStorage(): void {
-    window.sessionStorage.clear();
+    window.localStorage.clear();
 }

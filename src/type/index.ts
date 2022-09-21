@@ -29,6 +29,7 @@ export interface article {
 }
 
 export interface work {
+    index: number;
     name: string;
     desc: string;
     tag: Array<string>;

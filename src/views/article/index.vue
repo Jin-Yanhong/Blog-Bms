@@ -47,7 +47,7 @@
 
 		<!--  -->
 		<el-dialog v-model="dialogVisible" :title="dialogTitle" width="40%">
-			<el-form :model="itemForm" class="demo-form-inline" label-position="top">
+			<el-form :model="itemForm" :disabled="formDisabled" label-position="top" ref="itemFormRef" :rules="rules">
 				<el-row :gutter="10">
 					<el-col :span="12">
 						<el-form-item label="Title"> <el-input v-model="itemForm.title" placeholder="Article Title" /> </el-form-item>
@@ -82,7 +82,7 @@
 			<template #footer>
 				<span class="dialog-footer">
 					<el-button @click="dialogVisible = false">Cancel</el-button>
-					<el-button type="primary" @click="onItemSubmit">Confirm</el-button>
+					<el-button type="primary" @click="onItemSubmit(itemFormRef)">Confirm </el-button>
 				</span>
 			</template>
 		</el-dialog>
@@ -96,6 +96,7 @@ import { dialogType } from '@/enum';
 import { article, queryForm } from '@/type';
 import { ArrowLeft, ArrowRight, Delete, Edit, InfoFilled, Plus, Refresh } from '@element-plus/icons-vue';
 import { defineComponent, reactive, ref } from '@vue/runtime-core';
+import type { FormInstance, FormRules } from 'element-plus';
 import { ElMessage, ElMessageBox } from 'element-plus';
 
 export default defineComponent({
@@ -106,6 +107,20 @@ export default defineComponent({
 		let dialogVisible = ref(false);
 		let articleList = reactive<Array<article>>([]);
 		let dialogTitle = ref('');
+
+		const itemFormRef = ref<FormInstance>();
+
+		const formDisabled = ref<boolean>(false);
+
+		const rules = reactive<FormRules>({
+			title: [{ required: true, message: 'Please input title', trigger: 'change' }],
+			subTitle: [{ required: true, message: 'Please input subTitle', trigger: 'change' }],
+			date: [{ required: true, message: 'Please input date', trigger: 'change' }],
+			groupId: [{ required: true, message: 'Please input groupId', trigger: 'change' }],
+			author: [{ required: true, message: 'Please input author', trigger: 'change' }],
+			index: [{ required: true, message: 'Please input index', trigger: 'change' }],
+			content: [{ required: true, message: 'Please input content', trigger: 'change' }],
+		});
 		let isNextPageDisabled = ref<boolean>(false);
 		let dialogType = ref(0);
 		return {
@@ -116,6 +131,9 @@ export default defineComponent({
 			dialogTitle,
 			dialogType,
 			isNextPageDisabled,
+			itemFormRef,
+			rules,
+			formDisabled,
 		};
 	},
 	components: {
@@ -128,15 +146,18 @@ export default defineComponent({
 		Delete,
 	},
 	watch: {
-		dialogType: function (nVal) {
+		dialogType: function (nVal, oVal) {
 			switch (nVal) {
 				case dialogType.create:
+					this.formDisabled = false;
 					this.dialogTitle = 'Create';
 					break;
 				case dialogType.detail:
+					this.formDisabled = true;
 					this.dialogTitle = 'Detail';
 					break;
 				case dialogType.edit:
+					this.formDisabled = false;
 					this.dialogTitle = 'Edit';
 					break;
 				default:
@@ -233,36 +254,46 @@ export default defineComponent({
 			this.query.pageNum += 1;
 			this.handleQuery();
 		},
-		onItemSubmit() {
+		onItemSubmit: async function (formEl: FormInstance | undefined) {
 			switch (this.dialogType) {
 				case dialogType.create:
-					createArticle(this.itemForm)
-						.then(() => {
-							this.dialogVisible = false;
-							ElMessage({
-								message: 'Updated Successfully!',
-								type: 'success',
-							});
-							this.handleQuery();
-						})
-						.catch(err => {
-							console.log(err);
-						});
+					if (!formEl) return;
+					await formEl.validate((valid, fields) => {
+						if (valid) {
+							delete this.itemForm._id;
+							createArticle(this.itemForm)
+								.then(() => {
+									this.dialogVisible = false;
+									ElMessage({
+										message: 'Updated Successfully!',
+										type: 'success',
+									});
+									this.handleQuery();
+								})
+								.catch(err => {
+									console.log(err);
+								});
+						}
+					});
 					break;
 				case dialogType.edit:
-					updateArticle(this.itemForm._id as string, this.itemForm)
-						.then(() => {
-							this.dialogVisible = false;
-							ElMessage({
-								message: 'Created Successfully!',
-								type: 'success',
-							});
-							this.handleQuery();
-						})
-						.catch(err => {
-							console.log(err);
-						});
-
+					if (!formEl) return;
+					await formEl.validate((valid, fields) => {
+						if (valid) {
+							updateArticle(this.itemForm._id as string, this.itemForm)
+								.then(() => {
+									this.dialogVisible = false;
+									ElMessage({
+										message: 'Created Successfully!',
+										type: 'success',
+									});
+									this.handleQuery();
+								})
+								.catch(err => {
+									console.log(err);
+								});
+						}
+					});
 					break;
 				case dialogType.detail:
 					this.dialogVisible = false;

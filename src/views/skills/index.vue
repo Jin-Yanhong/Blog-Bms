@@ -49,21 +49,21 @@
 
 		<!--  -->
 		<el-dialog v-model="dialogVisible" :title="dialogTitle" width="40%">
-			<el-form :model="itemForm" class="demo-form-inline" label-position="top">
+			<el-form :model="itemForm" :disabled="formDisabled" label-position="top" ref="itemFormRef" :rules="rules">
 				<el-row :gutter="10">
 					<el-col :span="12">
-						<el-form-item label="Name"> <el-input v-model="itemForm.name" placeholder="Skill Name" /> </el-form-item>
+						<el-form-item label="Name" prop="name" required> <el-input v-model="itemForm.name" placeholder="Skill Name" /> </el-form-item>
 					</el-col>
 					<el-col :span="12">
-						<el-form-item label="Score"> <el-input v-model="itemForm.score" placeholder="Skill score" /> </el-form-item>
+						<el-form-item label="Score" prop="score" required> <el-input v-model="itemForm.score" placeholder="Skill Score" /> </el-form-item>
 					</el-col>
 				</el-row>
 				<el-row :gutter="10">
 					<el-col :span="12">
-						<el-form-item label="Index"> <el-input v-model="itemForm.index" placeholder="Skill Name" /> </el-form-item>
+						<el-form-item label="Index" prop="index" required> <el-input v-model="itemForm.index" placeholder="Skill Index" /> </el-form-item>
 					</el-col>
 					<el-col :span="12">
-						<el-form-item label="Color"> <el-input v-model="itemForm.color" placeholder="Skill score" /> </el-form-item>
+						<el-form-item label="Color" prop="color" required> <el-input v-model="itemForm.color" placeholder="Skill Color" /> </el-form-item>
 					</el-col>
 				</el-row>
 			</el-form>
@@ -71,7 +71,7 @@
 			<template #footer>
 				<span class="dialog-footer">
 					<el-button @click="dialogVisible = false">Cancel</el-button>
-					<el-button type="primary" @click="onItemSubmit">Confirm</el-button>
+					<el-button type="primary" @click="onItemSubmit(itemFormRef)">Confirm</el-button>
 				</span>
 			</template>
 		</el-dialog>
@@ -85,6 +85,7 @@ import { dialogType } from '@/enum';
 import { queryForm, skill } from '@/type';
 import { ArrowLeft, ArrowRight, Delete, Edit, InfoFilled, Plus, Refresh } from '@element-plus/icons-vue';
 import { defineComponent, reactive, ref } from '@vue/runtime-core';
+import type { FormInstance, FormRules } from 'element-plus';
 import { ElMessage, ElMessageBox } from 'element-plus';
 
 export default defineComponent({
@@ -92,6 +93,16 @@ export default defineComponent({
 	setup() {
 		let query = reactive<queryForm>({ pageSize: paginationConfig.pageSize, pageNum: paginationConfig.pageNum });
 		let itemForm = reactive<skill>({ name: '', score: 0, index: 0, color: '' });
+		const itemFormRef = ref<FormInstance>();
+
+		const formDisabled = ref<boolean>(false);
+
+		const rules = reactive<FormRules>({
+			name: [{ required: true, message: 'Please input name', trigger: 'blur' }],
+			score: [{ required: true, message: 'Please input score', trigger: 'blur' }],
+			index: [{ required: true, message: 'Please input index', trigger: 'blur' }],
+			color: [{ required: true, message: 'Please input color', trigger: 'blur' }],
+		});
 		let dialogVisible = ref(false);
 		let skillList = reactive<Array<skill>>([]);
 		let dialogTitle = ref('');
@@ -105,6 +116,9 @@ export default defineComponent({
 			dialogTitle,
 			dialogType,
 			isNextPageDisabled,
+			itemFormRef,
+			rules,
+			formDisabled,
 		};
 	},
 	components: {
@@ -120,12 +134,15 @@ export default defineComponent({
 		dialogType: function (nVal, oVal) {
 			switch (nVal) {
 				case dialogType.create:
+					this.formDisabled = false;
 					this.dialogTitle = 'Create';
 					break;
 				case dialogType.detail:
+					this.formDisabled = true;
 					this.dialogTitle = 'Detail';
 					break;
 				case dialogType.edit:
+					this.formDisabled = false;
 					this.dialogTitle = 'Edit';
 					break;
 				default:
@@ -139,6 +156,7 @@ export default defineComponent({
 	},
 	methods: {
 		setItemValue(item: skill) {
+			this.itemFormRef?.resetFields();
 			this.itemForm.name = item.name;
 			this.itemForm.score = item.score;
 			this.itemForm.index = item.index;
@@ -147,12 +165,12 @@ export default defineComponent({
 		},
 		handleQuery() {
 			getSkillsList(this.query)
-				.then((res) => {
+				.then(res => {
 					this.skillList = res;
 					this.isNextPageDisabled = this.skillList.length < this.query.pageSize;
 					this.$forceUpdate();
 				})
-				.catch((err) => {
+				.catch(err => {
 					console.log(err);
 				});
 		},
@@ -180,14 +198,14 @@ export default defineComponent({
 			ElMessageBox.confirm(`Are you sure to delete ${item.name} ?`)
 				.then(() => {
 					deleteSkill(item._id as string)
-						.then((res) => {
+						.then(res => {
 							ElMessage({
 								message: 'Deleted Successfully!',
 								type: 'success',
 							});
 							this.handleQuery();
 						})
-						.catch((err) => {
+						.catch(err => {
 							console.log(err);
 						});
 				})
@@ -203,37 +221,46 @@ export default defineComponent({
 			this.query.pageNum += 1;
 			this.handleQuery();
 		},
-		onItemSubmit() {
+		onItemSubmit: async function (formEl: FormInstance | undefined) {
 			switch (this.dialogType) {
 				case dialogType.create:
-					delete this.itemForm._id;
-					delete this.itemForm._id;
-					createSkill(this.itemForm)
-						.then((res) => {
-							this.dialogVisible = false;
-							ElMessage({
-								message: 'Updated Successfully!',
-								type: 'success',
-							});
-							this.handleQuery();
-						})
-						.catch((err) => {
-							console.log(err);
-						});
+					if (!formEl) return;
+					await formEl.validate((valid, fields) => {
+						if (valid) {
+							delete this.itemForm._id;
+							createSkill(this.itemForm)
+								.then(res => {
+									this.dialogVisible = false;
+									ElMessage({
+										message: 'Updated Successfully!',
+										type: 'success',
+									});
+									this.handleQuery();
+								})
+								.catch(err => {
+									console.log(err);
+								});
+						}
+					});
 					break;
 				case dialogType.edit:
-					updateSkill(this.itemForm._id as string, this.itemForm)
-						.then((res) => {
-							this.dialogVisible = false;
-							ElMessage({
-								message: 'Created Successfully!',
-								type: 'success',
-							});
-							this.handleQuery();
-						})
-						.catch((err) => {
-							console.log(err);
-						});
+					if (!formEl) return;
+					await formEl.validate((valid, fields) => {
+						if (valid) {
+							updateSkill(this.itemForm._id as string, this.itemForm)
+								.then(res => {
+									this.dialogVisible = false;
+									ElMessage({
+										message: 'Created Successfully!',
+										type: 'success',
+									});
+									this.handleQuery();
+								})
+								.catch(err => {
+									console.log(err);
+								});
+						}
+					});
 					break;
 				case dialogType.detail:
 					this.dialogVisible = false;

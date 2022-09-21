@@ -45,21 +45,21 @@
 
 		<!--  -->
 		<el-dialog v-model="dialogVisible" :title="dialogTitle" width="40%">
-			<el-form :model="itemForm" class="demo-form-inline" label-position="top">
+			<el-form :model="itemForm" :disabled="formDisabled" label-position="top" ref="itemFormRef" :rules="rules">
 				<el-row :gutter="10">
 					<el-col :span="12">
-						<el-form-item label="Label"> <el-input v-model="itemForm.label" placeholder="Dict Title" /> </el-form-item>
+						<el-form-item label="Label" prop="label" required> <el-input v-model="itemForm.label" placeholder="Dict Title" /> </el-form-item>
 					</el-col>
 					<el-col :span="12">
-						<el-form-item label="Index"> <el-input v-model="itemForm.index" placeholder="Dict Subtitle"></el-input> </el-form-item>
+						<el-form-item label="Index" prop="index" required> <el-input v-model="itemForm.index" placeholder="Dict Subtitle"></el-input> </el-form-item>
 					</el-col>
 				</el-row>
 				<el-row :gutter="10">
 					<el-col :span="12">
-						<el-form-item label="Key"> <el-input v-model="itemForm.key" placeholder="Dict Key" /> </el-form-item>
+						<el-form-item label="Key" prop="key" required> <el-input v-model="itemForm.key" placeholder="Dict Key" /> </el-form-item>
 					</el-col>
 					<el-col :span="12">
-						<el-form-item label="Desc"> <el-input v-model="itemForm.desc" placeholder="Dict Subtitle"></el-input> </el-form-item>
+						<el-form-item label="Desc" prop="desc" required> <el-input v-model="itemForm.desc" placeholder="Dict Subtitle"></el-input> </el-form-item>
 					</el-col>
 				</el-row>
 				<span class="el-form-item__label"> Value </span>
@@ -83,7 +83,7 @@
 			<template #footer>
 				<span class="dialog-footer">
 					<el-button @click="dialogVisible = false">Cancel</el-button>
-					<el-button type="primary" @click="onItemSubmit">Confirm</el-button>
+					<el-button type="primary" @click="onItemSubmit(itemFormRef)">Confirm</el-button>
 				</span>
 			</template>
 		</el-dialog>
@@ -97,7 +97,9 @@ import { dialogType } from '@/enum';
 import { dictKey, dictValue, queryForm } from '@/type';
 import { ArrowLeft, ArrowRight, Delete, Edit, InfoFilled, Plus, Refresh } from '@element-plus/icons-vue';
 import { defineComponent, nextTick, reactive, ref } from '@vue/runtime-core';
+import type { FormInstance, FormRules } from 'element-plus';
 import { ElInput, ElMessage, ElMessageBox } from 'element-plus';
+
 export default defineComponent({
 	name: 'view_Dict',
 	setup() {
@@ -112,7 +114,17 @@ export default defineComponent({
 		const inputValue = ref('');
 		const inputVisible = ref(false);
 		const InputRef = ref<InstanceType<typeof ElInput>>();
+		const itemFormRef = ref<FormInstance>();
 
+		const formDisabled = ref<boolean>(false);
+
+		const rules = reactive<FormRules>({
+			key: [{ required: true, message: 'Please input key', trigger: 'change' }],
+			index: [{ required: true, message: 'Please input index', trigger: 'blur' }],
+			label: [{ required: true, message: 'Please input label', trigger: 'change' }],
+			desc: [{ required: true, message: 'Please input desc', trigger: 'change' }],
+			value: [{ required: true, message: 'Please input value', trigger: 'blur' }],
+		});
 		let dialogVisible = ref(false);
 		let dictList = reactive<Array<dictValue>>([]);
 		let dialogTitle = ref('');
@@ -130,6 +142,9 @@ export default defineComponent({
 			inputValue,
 			inputVisible,
 			InputRef,
+			itemFormRef,
+			rules,
+			formDisabled,
 		};
 	},
 	components: {
@@ -145,12 +160,15 @@ export default defineComponent({
 		dialogType: function (nVal) {
 			switch (nVal) {
 				case dialogType.create:
+					this.formDisabled = false;
 					this.dialogTitle = 'Create';
 					break;
 				case dialogType.detail:
+					this.formDisabled = true;
 					this.dialogTitle = 'Detail';
 					break;
 				case dialogType.edit:
+					this.formDisabled = false;
 					this.dialogTitle = 'Edit';
 					break;
 				default:
@@ -164,6 +182,7 @@ export default defineComponent({
 	},
 	methods: {
 		setItemValue(item: dictKey) {
+			this.itemFormRef?.resetFields();
 			this.itemForm._id = item._id;
 			this.itemForm.key = item.key;
 			this.itemForm.index = item.index;
@@ -173,12 +192,12 @@ export default defineComponent({
 		},
 		handleQuery() {
 			getDictList(this.query)
-				.then((res) => {
+				.then(res => {
 					this.dictList = res;
 					this.isNextPageDisabled = this.dictList.length < this.query.pageSize;
 					this.$forceUpdate();
 				})
-				.catch((err) => {
+				.catch(err => {
 					console.log(err);
 				});
 		},
@@ -196,24 +215,24 @@ export default defineComponent({
 		handleDetail(item: dictKey) {
 			this.setItemValue(item);
 			getDictContent(item._id as string)
-				.then((res) => {
+				.then(res => {
 					this.dialogType = dialogType.detail;
 					this.dialogVisible = true;
 					this.itemForm.value = res.value;
 				})
-				.catch((err) => {
+				.catch(err => {
 					console.log(err);
 				});
 		},
 		handleEdit(item: dictKey) {
 			this.setItemValue(item);
 			getDictContent(item._id as string)
-				.then((res) => {
+				.then(res => {
 					this.dialogType = dialogType.edit;
 					this.dialogVisible = true;
 					this.itemForm.value = res.value;
 				})
-				.catch((err) => {
+				.catch(err => {
 					console.log(err);
 				});
 		},
@@ -221,14 +240,14 @@ export default defineComponent({
 			ElMessageBox.confirm(`Are you sure to delete ${item.label} ?`)
 				.then(() => {
 					deleteDict(item._id as string)
-						.then((res) => {
+						.then(res => {
 							ElMessage({
 								message: 'Deleted Successfully!',
 								type: 'success',
 							});
 							this.handleQuery();
 						})
-						.catch((err) => {
+						.catch(err => {
 							console.log(err);
 						});
 				})
@@ -244,36 +263,46 @@ export default defineComponent({
 			this.query.pageNum += 1;
 			this.handleQuery();
 		},
-		onItemSubmit() {
+		onItemSubmit: async function (formEl: FormInstance | undefined) {
 			switch (this.dialogType) {
 				case dialogType.create:
-					delete this.itemForm._id;
-					createDict(this.itemForm)
-						.then(() => {
-							this.dialogVisible = false;
-							ElMessage({
-								message: 'Updated Successfully!',
-								type: 'success',
-							});
-							this.handleQuery();
-						})
-						.catch((err) => {
-							console.log(err);
-						});
+					if (!formEl) return;
+					await formEl.validate((valid, fields) => {
+						if (valid) {
+							delete this.itemForm._id;
+							createDict(this.itemForm)
+								.then(() => {
+									this.dialogVisible = false;
+									ElMessage({
+										message: 'Created Successfully!',
+										type: 'success',
+									});
+									this.handleQuery();
+								})
+								.catch(err => {
+									console.log(err);
+								});
+						}
+					});
 					break;
 				case dialogType.edit:
-					updateDict(this.itemForm._id as string, this.itemForm)
-						.then(() => {
-							this.dialogVisible = false;
-							ElMessage({
-								message: 'Created Successfully!',
-								type: 'success',
-							});
-							this.handleQuery();
-						})
-						.catch((err) => {
-							console.log(err);
-						});
+					if (!formEl) return;
+					await formEl.validate((valid, fields) => {
+						if (valid) {
+							updateDict(this.itemForm._id as string, this.itemForm)
+								.then(() => {
+									this.dialogVisible = false;
+									ElMessage({
+										message: 'Created Successfully!',
+										type: 'success',
+									});
+									this.handleQuery();
+								})
+								.catch(err => {
+									console.log(err);
+								});
+						}
+					});
 					break;
 				case dialogType.detail:
 					this.dialogVisible = false;

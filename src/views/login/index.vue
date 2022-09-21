@@ -35,8 +35,8 @@ import type { FormInstance, FormRules } from 'element-plus';
 export default defineComponent({
 	setup() {
 		let form = reactive<loginForm>({
-			password: '',
-			user_name: '',
+			user_name: 'admin',
+			password: 'admin',
 		});
 		let AppName = ref<string>('');
 		const user = useUserStore();

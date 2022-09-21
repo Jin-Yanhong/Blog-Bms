@@ -54,25 +54,25 @@
 
 		<!--  -->
 		<el-dialog v-model="dialogVisible" :title="dialogTitle" width="40%">
-			<el-form :model="itemForm" class="demo-form-inline" label-position="top">
+			<el-form :model="itemForm" :disabled="formDisabled" label-position="top" ref="itemFormRef" :rules="rules">
 				<el-row :gutter="10">
 					<el-col :span="12">
-						<el-form-item label="Name"> <el-input v-model="itemForm.name" placeholder="Work Name" /> </el-form-item>
+						<el-form-item label="Name" prop="name" required> <el-input v-model="itemForm.name" placeholder="Work Name" /> </el-form-item>
 					</el-col>
 					<el-col :span="12">
-						<el-form-item label="ScreenShortUrl"> <el-input v-model="itemForm.screenShortUrl" placeholder="Work ScreenShortUrl" /> </el-form-item>
+						<el-form-item label="ScreenShortUrl" prop="screenShortUrl" required> <el-input v-model="itemForm.screenShortUrl" placeholder="Work ScreenShortUrl" /> </el-form-item>
 					</el-col>
 				</el-row>
 				<el-row :gutter="10">
 					<el-col :span="12">
-						<el-form-item label="Tag">
+						<el-form-item label="Tag" prop="tag" required>
 							<el-select v-model="itemForm.tag" placeholder="Work Tag" :multiple="true">
 								<el-option v-for="tag in workItem.tagList" :key="tag.value" :value="tag.value" :label="tag.label"></el-option>
 							</el-select>
 						</el-form-item>
 					</el-col>
 					<el-col :span="12">
-						<el-form-item label="Technology">
+						<el-form-item label="Technology" prop="technology" required>
 							<el-select v-model="itemForm.technology" placeholder="Work Technology" :multiple="true">
 								<el-option v-for="tech in workItem.techList" :key="tech.value" :value="tech.value" :label="tech.label"></el-option>
 							</el-select>
@@ -80,8 +80,11 @@
 					</el-col>
 				</el-row>
 				<el-row :gutter="10">
-					<el-col :span="24">
-						<el-form-item label="Description"> <el-input v-model="itemForm.desc" placeholder="Work Description" /> </el-form-item>
+					<el-col :span="12">
+						<el-form-item label="Description" prop="desc" required> <el-input type="textarea" :autosize="false" :resize="'none'" :rows="6" v-model="itemForm.desc" placeholder="Work Description" /> </el-form-item>
+					</el-col>
+					<el-col :span="12">
+						<el-form-item label="Index" prop="index" required> <el-input-number v-model="itemForm.index" placeholder="Work Description" /> </el-form-item>
 					</el-col>
 				</el-row>
 			</el-form>
@@ -89,7 +92,7 @@
 			<template #footer>
 				<span class="dialog-footer">
 					<el-button @click="dialogVisible = false">Cancel</el-button>
-					<el-button type="primary" @click="onItemSubmit">Confirm</el-button>
+					<el-button type="primary" @click="onItemSubmit(itemFormRef)">Confirm</el-button>
 				</span>
 			</template>
 		</el-dialog>
@@ -105,6 +108,7 @@ import { useDict } from '@/utils';
 import { fieldTranslate } from '@/utils/index';
 import { ArrowLeft, ArrowRight, Delete, Edit, InfoFilled, Plus, Refresh } from '@element-plus/icons-vue';
 import { defineComponent, reactive, ref } from '@vue/runtime-core';
+import type { FormInstance, FormRules } from 'element-plus';
 import { ElMessage, ElMessageBox } from 'element-plus';
 
 export default defineComponent({
@@ -116,6 +120,7 @@ export default defineComponent({
 		}
 		let query = reactive<queryForm>({ pageSize: paginationConfig.pageSize, pageNum: paginationConfig.pageNum });
 		let itemForm = reactive<work>({
+			index: 0,
 			name: '',
 			desc: '',
 			tag: [],
@@ -127,6 +132,18 @@ export default defineComponent({
 			techList: [],
 		});
 
+		const itemFormRef = ref<FormInstance>();
+
+		const formDisabled = ref<boolean>(false);
+
+		const rules = reactive<FormRules>({
+			index: [{ required: true, message: 'Please input index', trigger: 'change' }],
+			name: [{ required: true, message: 'Please input name', trigger: 'blur' }],
+			desc: [{ required: true, message: 'Please input desc', trigger: 'change' }],
+			tag: [{ required: true, message: 'Please input tag', trigger: 'change' }],
+			technology: [{ required: true, message: 'Please input technology', trigger: 'blur' }],
+			screenShortUrl: [{ required: true, message: 'Please input screenShortUrl', trigger: 'blur' }],
+		});
 		let dialogVisible = ref(false);
 		let workList = reactive<Array<work>>([]);
 		let dialogTitle = ref('');
@@ -141,6 +158,9 @@ export default defineComponent({
 			dialogTitle,
 			dialogType,
 			isNextPageDisabled,
+			itemFormRef,
+			rules,
+			formDisabled,
 		};
 	},
 	components: {
@@ -156,12 +176,15 @@ export default defineComponent({
 		dialogType: function (nVal, oVal) {
 			switch (nVal) {
 				case dialogType.create:
+					this.formDisabled = false;
 					this.dialogTitle = 'Create';
 					break;
 				case dialogType.detail:
+					this.formDisabled = true;
 					this.dialogTitle = 'Detail';
 					break;
 				case dialogType.edit:
+					this.formDisabled = false;
 					this.dialogTitle = 'Edit';
 					break;
 				default:
@@ -173,16 +196,17 @@ export default defineComponent({
 	created() {
 		this.handleQuery();
 		// 技术栈字典
-		useDict(1).then((dict) => {
+		useDict(1).then(dict => {
 			this.workItem.techList = dict.value;
 		});
 		// 应用标签
-		useDict(2).then((dict) => {
+		useDict(2).then(dict => {
 			this.workItem.tagList = dict.value;
 		});
 	},
 	methods: {
 		setItemValue(item: work) {
+			this.itemFormRef?.resetFields();
 			this.itemForm.name = item.name;
 			this.itemForm.desc = item.desc;
 			this.itemForm.tag = item.tag;
@@ -191,18 +215,19 @@ export default defineComponent({
 		},
 		handleQuery() {
 			getWorkList(this.query)
-				.then((res) => {
+				.then(res => {
 					this.workList = res;
 					this.isNextPageDisabled = this.workList.length < this.query.pageSize;
 					this.$forceUpdate();
 				})
-				.catch((err) => {
+				.catch(err => {
 					console.log(err);
 				});
 		},
 		handleCreate() {
 			this.dialogType = dialogType.create;
 			this.setItemValue({
+				index: 0,
 				name: '',
 				desc: '',
 				tag: [],
@@ -226,14 +251,14 @@ export default defineComponent({
 			ElMessageBox.confirm(`Are you sure to delete ${item.name} ?`)
 				.then(() => {
 					deleteWork(item._id as string)
-						.then((res) => {
+						.then(res => {
 							ElMessage({
 								message: 'Deleted Successfully!',
 								type: 'success',
 							});
 							this.handleQuery();
 						})
-						.catch((err) => {
+						.catch(err => {
 							console.log(err);
 						});
 				})
@@ -249,36 +274,46 @@ export default defineComponent({
 			this.query.pageNum += 1;
 			this.handleQuery();
 		},
-		onItemSubmit() {
+		onItemSubmit: async function (formEl: FormInstance | undefined) {
 			switch (this.dialogType) {
 				case dialogType.create:
-					delete this.itemForm._id;
-					createWork(this.itemForm)
-						.then(() => {
-							this.dialogVisible = false;
-							ElMessage({
-								message: 'Updated Successfully!',
-								type: 'success',
-							});
-							this.handleQuery();
-						})
-						.catch((err) => {
-							console.log(err);
-						});
+					if (!formEl) return;
+					await formEl.validate((valid, fields) => {
+						if (valid) {
+							delete this.itemForm._id;
+							createWork(this.itemForm)
+								.then(() => {
+									this.dialogVisible = false;
+									ElMessage({
+										message: 'Created Successfully!',
+										type: 'success',
+									});
+									this.handleQuery();
+								})
+								.catch(err => {
+									console.log(err);
+								});
+						}
+					});
 					break;
 				case dialogType.edit:
-					updateWork(this.itemForm._id as string, this.itemForm)
-						.then(() => {
-							this.dialogVisible = false;
-							ElMessage({
-								message: 'Created Successfully!',
-								type: 'success',
-							});
-							this.handleQuery();
-						})
-						.catch((err) => {
-							console.log(err);
-						});
+					if (!formEl) return;
+					await formEl.validate((valid, fields) => {
+						if (valid) {
+							updateWork(this.itemForm._id as string, this.itemForm)
+								.then(() => {
+									this.dialogVisible = false;
+									ElMessage({
+										message: 'Created Successfully!',
+										type: 'success',
+									});
+									this.handleQuery();
+								})
+								.catch(err => {
+									console.log(err);
+								});
+						}
+					});
 					break;
 				case dialogType.detail:
 					this.dialogVisible = false;
