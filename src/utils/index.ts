@@ -49,18 +49,19 @@ export function getStorage(key: string): string {
     let str: string = window.localStorage.getItem(key) ?? '';
     try {
         if (str) {
-            return str;
+            return JSON.parse(str)[key];
         } else {
             return '';
         }
     } catch (error: any) {
-        // console.log(error);
         return '';
     }
 }
 
 export function setStorage(key: string, value: any): void {
-    let str = JSON.stringify(value);
+    let str = JSON.stringify({
+        [key]: value,
+    });
     window.localStorage.setItem(key, str);
 }
 

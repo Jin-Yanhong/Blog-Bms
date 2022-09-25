@@ -15,8 +15,8 @@ service.interceptors.request.use(
         let customerHeaders: AxiosRequestHeaders = {
             'Content-Type': 'application/json;charset=utf-8',
         };
-        if (useUserStore().token) {
-            customerHeaders.accessToken = useUserStore().token;
+        if (useUserStore().getToken) {
+            customerHeaders.accessToken = useUserStore().getToken;
         }
         config.headers = Object.assign(config.headers ?? {}, customerHeaders);
         return config;

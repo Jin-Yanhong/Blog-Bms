@@ -9,7 +9,7 @@ export const useUserStore = defineStore({
         token: getStorage('token'),
     }),
     getters: {
-        getToken: (state) => {
+        getToken: state => {
             return state.token;
         },
     },

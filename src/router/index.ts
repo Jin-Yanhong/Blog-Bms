@@ -47,6 +47,7 @@ export const routes: Array<RouteRecordRaw> = [
     {
         path: '/system',
         name: 'system',
+        redirect: '/system/dict',
         component: Layout,
         meta: {
             title: '系统管理',
@@ -71,7 +72,7 @@ export const routes: Array<RouteRecordRaw> = [
     {
         path: '/content',
         name: 'content',
-        redirect: '/dashboard',
+        redirect: '/content/article',
         component: Layout,
         meta: {
             title: '内容管理',
@@ -133,7 +134,7 @@ const router = createRouter({
 
 router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalized, next) => {
     NProgress.start();
-    if (useUserStore().token) {
+    if (useUserStore().getToken) {
         if (to.path === '/login') {
             next({ path: '/' });
             NProgress.done();
