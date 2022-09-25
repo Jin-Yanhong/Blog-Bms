@@ -11,7 +11,10 @@
 				</el-breadcrumb>
 			</div>
 			<div>
-				<el-tag class="tagsView" v-for="tag in tagViews" :key="tag.path" :closable="tagViews.length > 1" @close="tagClose(tag)" :effect="tag.isActive ? 'dark' : 'light'">
+				<el-tag class="tagsView" :effect="current.path === '/dashboard' ? 'dark' : 'light'">
+					<router-link :class="['noActive', current.path === '/dashboard' ? ' Active' : '']" :to="{ path: '/' }"> 首页 </router-link>
+				</el-tag>
+				<el-tag class="tagsView" v-for="tag in tagViews" :key="tag.path" closable @close="tagClose(tag)" :effect="tag.isActive ? 'dark' : 'light'">
 					<router-link :class="['noActive', tag.isActive ? ' Active' : '']" :to="tag.path">
 						{{ tag.title }}
 					</router-link>
@@ -67,13 +70,7 @@ export default defineComponent({
 		const user = useUserStore();
 		const current = useRoute();
 		let breadcrumbList = ref<Array<RouteLocationMatched>>(current.matched);
-		let tagViews = ref<Array<tagViewsType>>([
-			{
-				title: current.meta?.title as string,
-				path: current.path,
-				isActive: true,
-			},
-		]);
+		let tagViews = ref<Array<tagViewsType>>([]);
 		return {
 			bgColor,
 			routerList,
@@ -100,22 +97,27 @@ export default defineComponent({
 				path: nVal.path,
 				isActive: true,
 			};
-
-			this.tagViews = this.tagViews.map(el => {
-				return { ...el, isActive: el.path === item.path };
-			});
-
-			let hasTag =
-				this.tagViews.filter(el => {
-					return el.path === item.path;
-				}).length === 1;
-
-			if (!hasTag) {
-				this.tagViews.push({
-					title: nVal.meta?.title,
-					path: nVal.path,
-					isActive: true,
+			if (nVal.path === '/dashboard') {
+				this.tagViews = this.tagViews.map(el => {
+					return { ...el, isActive: false };
 				});
+			} else {
+				this.tagViews = this.tagViews.map(el => {
+					return { ...el, isActive: el.path === item.path };
+				});
+
+				let hasTag =
+					this.tagViews.filter(el => {
+						return el.path === item.path;
+					}).length === 1;
+
+				if (!hasTag) {
+					this.tagViews.push({
+						title: nVal.meta?.title,
+						path: nVal.path,
+						isActive: true,
+					});
+				}
 			}
 		},
 	},
@@ -138,7 +140,7 @@ export default defineComponent({
 			});
 		},
 		tagClose(tag: tagViewsType) {
-			if (tag.path === '/dashboard' || this.tagViews.length === 1) {
+			if (this.tagViews.length === 1) {
 				return;
 			} else {
 				let index = this.tagViews.indexOf(tag);
@@ -153,6 +155,7 @@ export default defineComponent({
 
 .navbar {
 	background-color: v-bind(bgColor);
+	padding-left: 12px;
 	.userCenter {
 		color: #fff;
 		line-height: 58px;
