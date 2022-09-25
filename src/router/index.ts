@@ -1,4 +1,4 @@
-import AppMain from '@/layout/components/AppMain.vue';
+import Layout from '@/layout/index.vue';
 import { useUserStore } from '@/store/user';
 import { ElMessage } from 'element-plus';
 import NProgress from 'nprogress';
@@ -23,7 +23,7 @@ export const routes: Array<RouteRecordRaw> = [
         path: '/',
         redirect: '/dashboard',
         name: 'root',
-        component: AppMain,
+        component: Layout,
         meta: {
             title: '系统概要',
             icon: 'Odometer',
@@ -47,7 +47,7 @@ export const routes: Array<RouteRecordRaw> = [
     {
         path: '/system',
         name: 'system',
-        component: AppMain,
+        component: Layout,
         meta: {
             title: '系统管理',
             icon: 'Setting',
@@ -72,7 +72,7 @@ export const routes: Array<RouteRecordRaw> = [
         path: '/content',
         name: 'content',
         redirect: '/dashboard',
-        component: AppMain,
+        component: Layout,
         meta: {
             title: '内容管理',
             icon: 'Collection',
