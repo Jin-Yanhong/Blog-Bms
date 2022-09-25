@@ -11,7 +11,7 @@
 				</el-breadcrumb>
 			</div>
 			<div>
-				<el-tag class="tagsView" v-for="tag in tagViews" :key="tag.path" closable :effect="tag.isActive ? 'dark' : 'light'">
+				<el-tag class="tagsView" v-for="tag in tagViews" :key="tag.path" :closable="tagViews.length > 1" @close="tagClose(tag)" :effect="tag.isActive ? 'dark' : 'light'">
 					<router-link :class="['noActive', tag.isActive ? ' Active' : '']" :to="tag.path">
 						{{ tag.title }}
 					</router-link>
@@ -136,6 +136,14 @@ export default defineComponent({
 				this.user.handleLogout();
 				location.reload();
 			});
+		},
+		tagClose(tag: tagViewsType) {
+			if (tag.path === '/dashboard' || this.tagViews.length === 1) {
+				return;
+			} else {
+				let index = this.tagViews.indexOf(tag);
+				this.tagViews.splice(index, 1);
+			}
 		},
 	},
 });
