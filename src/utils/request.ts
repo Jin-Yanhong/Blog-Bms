@@ -4,7 +4,7 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import { failCode } from './constant';
 
 const service = axios.create({
-    baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
+    baseURL: process.env.VUE_APP_ENV === 'production' ? process.env.VUE_APP_SERVER_URL : process.env.VUE_APP_BASE_API, // url = base url + request url
     timeout: 5000,
     // withCredentials: true // send cookies when cross-domain requests
 });
