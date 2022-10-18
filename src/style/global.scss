@@ -1,90 +1,90 @@
 @import './variables.scss';
 
 .view {
-	padding: 12px;
-	background: #ececec;
-	height: calc(100% - 24px);
+    padding: 12px;
+    background: #ececec;
+    height: calc(100% - 24px);
 }
 
 a {
-	text-decoration: none;
-	:focus {
-		color: #fff;
-	}
+    text-decoration: none;
+    :focus {
+        color: #fff;
+    }
 }
 
 .flex {
-	display: flex;
-	&-center {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		&-column {
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-		}
-	}
-	&-between {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		&-column {
-			display: flex;
-			flex-direction: column;
-			justify-content: space-between;
-		}
-	}
-	&-between {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-	&-evenly {
-		display: flex;
-		justify-content: space-evenly;
-		align-items: center;
-	}
-	&-center-up {
-		display: flex;
-		justify-content: center;
-		align-items: flex-start;
-	}
-	&-start-up {
-		display: flex;
-		justify-content: flex-start;
-		align-items: flex-start;
-	}
+    display: flex;
+    &-center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        &-column {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+    }
+    &-between {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        &-column {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+    }
+    &-between {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    &-evenly {
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+    }
+    &-center-up {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
+    &-start-up {
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+    }
 }
 .scroll-y {
-	scroll-behavior: smooth;
-	$scrollbarWidth: 5px;
-	/* 滚动条 */
-	&::-webkit-scrollbar {
-		width: $scrollbarWidth;
-		height: $scrollbarWidth;
-	}
+    scroll-behavior: smooth;
+    $scrollbarWidth: 5px;
+    /* 滚动条 */
+    &::-webkit-scrollbar {
+        width: $scrollbarWidth;
+        height: $scrollbarWidth;
+    }
 
-	/* 滚动槽 */
-	&::-webkit-scrollbar-track {
-		border-radius: $scrollbarWidth;
-		background: #fff;
-	}
+    /* 滚动槽 */
+    &::-webkit-scrollbar-track {
+        border-radius: $scrollbarWidth;
+        background: #fff;
+    }
 
-	/* 滚动条滑块 */
-	&::-webkit-scrollbar-thumb {
-		border-radius: $scrollbarWidth;
-		background: $themeColor;
-	}
+    /* 滚动条滑块 */
+    &::-webkit-scrollbar-thumb {
+        border-radius: $scrollbarWidth;
+        background: $themeColor;
+    }
 }
 
 body {
-	background-color: #fff;
-	font-family: 'PingFang';
-	&::-webkit-scrollbar {
-		width: 0;
-		height: 0;
-		background: transparent;
-		display: none;
-	}
+    background-color: #fff;
+    font-family: 'PingFang';
+    &::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+        background: transparent;
+        display: none;
+    }
 }

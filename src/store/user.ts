@@ -9,20 +9,20 @@ export const useUserStore = defineStore({
         token: getStorage('token'),
     }),
     getters: {
-        getToken: state => {
+        getToken: (state) => {
             return state.token;
         },
     },
     actions: {
-        handleLogout() {
+        handleLogout () {
             this.$patch({
                 token: '',
             });
             clearStorage();
         },
-        async handleLogin(loginForm: loginForm) {
+        async handleLogin (loginForm: loginForm) {
             try {
-                let { accessToken = '' } = await login(loginForm);
+                const { accessToken = '' } = await login(loginForm);
                 setStorage('token', accessToken);
                 this.$patch({
                     token: accessToken,

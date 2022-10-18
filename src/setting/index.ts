@@ -1,1 +1,1 @@
-export const memuBgColor: string = '#555c64';
+export const memuBgColor = '#555c64';

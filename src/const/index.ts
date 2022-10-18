@@ -1,4 +1,4 @@
 export const paginationConfig = {
-	pageSize: 10,
-	pageNum: 1,
+    pageSize: 10,
+    pageNum: 1,
 };

@@ -6,8 +6,8 @@
                     <el-button type="primary" @click="handleQuery">
                         <el-icon class="el-icon--refresh"><Refresh /></el-icon> Query
                     </el-button>
-                    <el-button type="success" @click="handleCreate">
-                        <el-icon class="el-icon--plus"><Plus /></el-icon> Create
+                    <el-button type="success" @click="handleUpload">
+                        <el-icon class="el-icon--plus"><Plus /></el-icon> Upload
                     </el-button>
                 </el-col>
                 <el-col :span="6"> </el-col>
@@ -15,15 +15,11 @@
         </div>
 
         <!--  -->
-        <el-table :data="skillList" class="listTable">
-            <el-table-column prop="index" label="Index" align="center" />
-            <el-table-column prop="name" label="Name" align="center" />
-            <el-table-column prop="score" label="Score" align="center" />
-            <el-table-column prop="color" label="Color" align="center">
-                <template #default="scope">
-                    <div class="colorBlock" :style="{ backgroundColor: scope.row.color }">{{ scope.row.color }}</div>
-                </template>
-            </el-table-column>
+        <el-table :data="dictList" class="listTable" border>
+            <el-table-column prop="index" label="Index" align="center" width="70" />
+            <el-table-column prop="label" label="Label" align="center" width="300" />
+            <el-table-column prop="key" label="Key" align="center" width="60" />
+            <el-table-column prop="desc" label="Description" align="center" />
             <el-table-column label="Operations" width="260" align="center">
                 <template #default="scope">
                     <el-button type="info" size="small" @click="handleDetail(scope.row)">
@@ -52,22 +48,18 @@
             <el-form :model="itemForm" :disabled="formDisabled" label-position="top" ref="itemFormRef" :rules="rules">
                 <el-row :gutter="10">
                     <el-col :span="12">
-                        <el-form-item label="Name" prop="name" required> <el-input v-model="itemForm.name" placeholder="Skill Name" /> </el-form-item>
+                        <el-form-item label="Label" prop="label" required> <el-input v-model="itemForm.label" placeholder="Dict Title" /> </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                        <el-form-item label="Score" prop="score" required> <el-input v-model="itemForm.score" placeholder="Skill Score" /> </el-form-item>
+                        <el-form-item label="Index" prop="index" required> <el-input v-model="itemForm.index" placeholder="Dict Subtitle"></el-input> </el-form-item>
                     </el-col>
                 </el-row>
                 <el-row :gutter="10">
-                    <el-col :span="12">
-                        <el-form-item label="Index" prop="index" required> <el-input v-model="itemForm.index" placeholder="Skill Index" /> </el-form-item>
-                    </el-col>
-                    <el-col :span="12">
-                        <el-form-item label="Color" prop="color" required> <el-input v-model="itemForm.color" placeholder="Skill Color" /> </el-form-item>
+                    <el-col :span="24">
+                        <el-upload />
                     </el-col>
                 </el-row>
             </el-form>
-
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="dialogVisible = false">Cancel</el-button>
@@ -79,43 +71,57 @@
 </template>
 
 <script lang="ts">
-import { createSkill, deleteSkill, getSkillsList, updateSkill } from '@/api/skills';
+import { createDict, deleteDict, getDictContent, getDictList, updateDict } from '@/api/dict';
 import { paginationConfig } from '@/const';
 import { dialogType } from '@/enum';
-import { queryForm, skill } from '@/type';
+import { dictKey, dictValue, queryForm } from '@/type';
 import { ArrowLeft, ArrowRight, Delete, Edit, InfoFilled, Plus, Refresh } from '@element-plus/icons-vue';
 import type { FormInstance, FormRules } from 'element-plus';
-import { ElMessage, ElMessageBox } from 'element-plus';
-import { defineComponent, reactive, ref } from 'vue';
+import { ElInput, ElMessage, ElMessageBox } from 'element-plus';
+import { defineComponent, nextTick, reactive, ref } from 'vue';
 
 export default defineComponent({
-    name: 'view_Skills',
+    name: 'view_Dict',
     setup () {
         const query = reactive<queryForm>({ pageSize: paginationConfig.pageSize, pageNum: paginationConfig.pageNum });
-        const itemForm = reactive<skill>({ name: '', score: 0, index: 0, color: '' });
+        const itemForm = reactive<dictKey>({
+            key: 0,
+            index: 0,
+            label: '',
+            desc: '',
+            value: [],
+        });
+        const inputValue = ref('');
+        const inputVisible = ref(false);
+        const InputRef = ref<InstanceType<typeof ElInput>>();
         const itemFormRef = ref<FormInstance>();
 
         const formDisabled = ref<boolean>(false);
 
         const rules = reactive<FormRules>({
-            name: [{ required: true, message: 'Please input name', trigger: 'blur' }],
-            score: [{ required: true, message: 'Please input score', trigger: 'blur' }],
+            key: [{ required: true, message: 'Please input key', trigger: 'change' }],
             index: [{ required: true, message: 'Please input index', trigger: 'blur' }],
-            color: [{ required: true, message: 'Please input color', trigger: 'blur' }],
+            label: [{ required: true, message: 'Please input label', trigger: 'change' }],
+            desc: [{ required: true, message: 'Please input desc', trigger: 'change' }],
+            value: [{ required: true, message: 'Please input value', trigger: 'blur' }],
         });
         const dialogVisible = ref(false);
-        const skillList = reactive<Array<skill>>([]);
+        const dictList = reactive<Array<dictValue>>([]);
         const dialogTitle = ref('');
         const isNextPageDisabled = ref<boolean>(false);
         const dialogType = ref(0);
+
         return {
             query,
-            skillList,
+            dictList,
             itemForm,
             dialogVisible,
             dialogTitle,
             dialogType,
             isNextPageDisabled,
+            inputValue,
+            inputVisible,
+            InputRef,
             itemFormRef,
             rules,
             formDisabled,
@@ -131,11 +137,11 @@ export default defineComponent({
         Delete,
     },
     watch: {
-        dialogType: function (nVal, oVal) {
+        dialogType: function (nVal) {
             switch (nVal) {
-            case dialogType.create:
+            case dialogType.upload:
                 this.formDisabled = false;
-                this.dialogTitle = 'Create';
+                this.dialogTitle = 'Upload';
                 break;
             case dialogType.detail:
                 this.formDisabled = true;
@@ -152,52 +158,68 @@ export default defineComponent({
         },
     },
     created () {
-        this.handleQuery();
+        // this.handleQuery();
     },
     methods: {
-        setItemValue (item: skill) {
+        setItemValue (item: dictKey) {
             this.itemFormRef?.resetFields();
-            this.itemForm.name = item.name;
-            this.itemForm.score = item.score;
-            this.itemForm.index = item.index;
-            this.itemForm.color = item.color;
             this.itemForm._id = item._id;
+            this.itemForm.key = item.key;
+            this.itemForm.index = item.index;
+            this.itemForm.label = item.label;
+            this.itemForm.desc = item.desc;
+            this.itemForm.value = item.value;
         },
         handleQuery () {
-            getSkillsList(this.query)
+            getDictList(this.query)
                 .then((res) => {
-                    this.skillList = res;
-                    this.isNextPageDisabled = this.skillList.length < this.query.pageSize;
+                    this.dictList = res;
+                    this.isNextPageDisabled = this.dictList.length < this.query.pageSize;
                     this.$forceUpdate();
                 })
                 .catch((err) => {
                     console.log(err);
                 });
         },
-        handleCreate () {
-            this.dialogType = dialogType.create;
+        handleUpload () {
+            this.dialogType = dialogType.upload;
             this.setItemValue({
-                name: '',
-                score: 0,
+                key: 0,
                 index: 0,
-                color: '',
+                label: '',
+                desc: '',
+                value: [],
             });
             this.dialogVisible = true;
         },
-        handleDetail (item: skill) {
-            this.dialogType = dialogType.detail;
-            this.dialogVisible = true;
+        handleDetail (item: dictKey) {
             this.setItemValue(item);
+            getDictContent(item._id as string)
+                .then((res) => {
+                    this.dialogType = dialogType.detail;
+                    this.dialogVisible = true;
+                    this.itemForm.value = res.value;
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
         },
-        handleEdit (item: skill) {
-            this.dialogType = dialogType.edit;
-            this.dialogVisible = true;
+        handleEdit (item: dictKey) {
             this.setItemValue(item);
+            getDictContent(item._id as string)
+                .then((res) => {
+                    this.dialogType = dialogType.edit;
+                    this.dialogVisible = true;
+                    this.itemForm.value = res.value;
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
         },
-        handleDelete (item: skill) {
-            ElMessageBox.confirm(`Are you sure to delete ${item.name} ?`)
+        handleDelete (item: dictKey) {
+            ElMessageBox.confirm(`Are you sure to delete ${item.label} ?`)
                 .then(() => {
-                    deleteSkill(item._id as string)
+                    deleteDict(item._id as string)
                         .then((res) => {
                             ElMessage({
                                 message: 'Deleted Successfully!',
@@ -223,16 +245,16 @@ export default defineComponent({
         },
         onItemSubmit: async function (formEl: FormInstance | undefined) {
             switch (this.dialogType) {
-            case dialogType.create:
+            case dialogType.upload:
                 if (!formEl) return;
                 await formEl.validate((valid, fields) => {
                     if (valid) {
                         delete this.itemForm._id;
-                        createSkill(this.itemForm)
-                            .then((res) => {
+                        createDict(this.itemForm)
+                            .then(() => {
                                 this.dialogVisible = false;
                                 ElMessage({
-                                    message: 'Updated Successfully!',
+                                    message: 'Created Successfully!',
                                     type: 'success',
                                 });
                                 this.handleQuery();
@@ -247,8 +269,8 @@ export default defineComponent({
                 if (!formEl) return;
                 await formEl.validate((valid, fields) => {
                     if (valid) {
-                        updateSkill(this.itemForm._id as string, this.itemForm)
-                            .then((res) => {
+                        updateDict(this.itemForm._id as string, this.itemForm)
+                            .then(() => {
                                 this.dialogVisible = false;
                                 ElMessage({
                                     message: 'Created Successfully!',
@@ -269,6 +291,26 @@ export default defineComponent({
                 this.dialogVisible = false;
                 break;
             }
+        },
+        handleTagDelete (tag: dictValue) {
+            this.itemForm.value?.splice(this.itemForm.value?.indexOf(tag), 1);
+            console.dir(this.itemForm.value);
+        },
+        showInput () {
+            this.inputVisible = true;
+            nextTick(() => {
+                this.InputRef!.input!.focus();
+            });
+        },
+        handleInputConfirm () {
+            if (this.inputValue) {
+                this.itemForm?.value?.push({
+                    label: this.inputValue,
+                    value: this.itemForm?.value?.length + 1,
+                });
+            }
+            this.inputVisible = false;
+            this.inputValue = '';
         },
     },
 });
@@ -294,6 +336,24 @@ export default defineComponent({
     }
 }
 
+.valueContainer {
+    max-height: 300px;
+    overflow-y: auto;
+    border-radius: 4px;
+    border: 1px solid var(--el-border-color);
+    p {
+        padding: 10px;
+        width: calc(100% - 22px);
+        & > span {
+            margin: 0 4px;
+        }
+        &:nth-last-child(1) {
+            /* 偶数 */
+            margin: 0;
+            border-top: 1px solid var(--el-border-color);
+        }
+    }
+}
 .Pager {
     margin: 20px 0;
     float: right;

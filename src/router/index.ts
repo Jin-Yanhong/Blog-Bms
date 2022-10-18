@@ -116,6 +116,31 @@ export const routes: Array<RouteRecordRaw> = [
             },
         ],
     },
+    {
+        path: '/file',
+        name: 'file',
+        redirect: '/file',
+        component: Layout,
+        meta: {
+            title: '文件管理',
+            icon: 'files',
+            cache: true,
+            show: false,
+        },
+        children: [
+            {
+                path: '',
+                name: 'index',
+                component: () => import('@/views/file/index.vue'),
+                meta: {
+                    title: '附件管理',
+                    icon: 'Document',
+                    cache: true,
+                    show: true,
+                },
+            },
+        ],
+    },
     // 匹配不到页面返回 dashboard
     {
         path: '/:pathMatch(.*)*',
@@ -144,7 +169,7 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
             } catch (err: any) {
                 useUserStore().handleLogout();
                 ElMessage.error(err.message || 'Has Error');
-                next(`/login`);
+                next('/login');
                 NProgress.done();
             }
         }

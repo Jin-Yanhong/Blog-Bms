@@ -6,13 +6,13 @@ import { failCode } from './constant';
 const service = axios.create({
     baseURL: process.env.VUE_APP_ENV === 'production' ? process.env.VUE_APP_SERVER_URL : process.env.VUE_APP_BASE_API, // url = base url + request url
     timeout: 5000,
-    // withCredentials: true // send cookies when cross-domain requests
+    withCredentials: true, // send cookies when cross-domain requests
 });
 
 // Request interceptors
 service.interceptors.request.use(
-    config => {
-        let customerHeaders: AxiosRequestHeaders = {
+    (config) => {
+        const customerHeaders: AxiosRequestHeaders = {
             'Content-Type': 'application/json;charset=utf-8',
         };
         if (useUserStore().getToken) {
@@ -21,14 +21,14 @@ service.interceptors.request.use(
         config.headers = Object.assign(config.headers ?? {}, customerHeaders);
         return config;
     },
-    error => {
+    (error) => {
         Promise.reject(error);
-    }
+    },
 );
 
 // Response interceptors
 service.interceptors.response.use(
-    response => {
+    (response) => {
         const res = response.data;
         const code = res.code;
 
@@ -54,14 +54,14 @@ service.interceptors.response.use(
             return response.data.data;
         }
     },
-    error => {
+    (error) => {
         ElMessage({
             message: error.message,
             type: 'error',
             duration: 5 * 1000,
         });
         return Promise.reject(error);
-    }
+    },
 );
 
 export default service;

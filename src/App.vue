@@ -1,30 +1,11 @@
 <template>
-	<router-view />
-	<keep-alive></keep-alive>
+    <router-view />
 </template>
 <script lang="ts">
-import { useUserStore } from '@/store/user';
-import { clearStorage } from '@/utils/index';
-import { defineComponent } from '@vue/runtime-core';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
-	name: 'App',
-	setup() {
-		const user = useUserStore();
-		return {
-			user,
-		};
-	},
-	created() {
-		let _this = this;
-		window.onclose = function () {
-			_this.user.handleLogout();
-			clearStorage();
-		};
-	},
-	beforeDestroy() {
-		clearStorage();
-	},
+    name: 'App',
 });
 </script>
 <style lang="scss"></style>

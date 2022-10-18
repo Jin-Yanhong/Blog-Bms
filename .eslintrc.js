@@ -1,33 +1,27 @@
 module.exports = {
-    root: true,
     env: {
-        node: true,
+        browser: true,
+        es2021: true,
     },
-    extends: ['plugin:vue/vue3-essential', 'eslint:recommended', '@vue/typescript/recommended', 'plugin:prettier/recommended'],
+    extends: ['plugin:vue/essential', 'google'],
     parserOptions: {
-        ecmaVersion: 2020,
+        ecmaVersion: 12,
+        parser: '@typescript-eslint/parser',
+        sourceType: 'module',
     },
+    plugins: ['vue', '@typescript-eslint'],
+    ignorePatterns: ['**/assets/*'],
     rules: {
-        quotes: [
-            'error',
-            'single',
-            {
-                avoidEscape: true,
-                allowTemplateLiterals: true,
-            },
-        ],
-        indent: ['error', 'tab'],
-        semi: ['error', 'always'],
-        'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-        'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-        'linebreak-style': ['error', 'windows'],
+        'indent': ['warn', 4],
+        'quotes': ['warn', 'single'],
+        'semi': ['warn', 'always'],
+        'max-len': ['warn', { code: 360 }],
+        'linebreak-style': ['warn', 'windows'],
+        'object-curly-spacing': ['warn', 'always'],
+        'space-before-function-paren': ['warn', 'always'],
+        'vue/multi-word-component-names': 0,
+        'new-cap': 0,
+        'require-jsdoc': 0,
+        'valid-jsdoc': 0,
     },
-    overrides: [
-        {
-            files: ['**/__tests__/*.{j,t}s?(x)', '**/tests/unit/**/*.spec.{j,t}s?(x)'],
-            env: {
-                jest: true,
-            },
-        },
-    ],
 };

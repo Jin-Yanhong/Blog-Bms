@@ -6,8 +6,8 @@ import { dictValue, dictValueList } from '@/type';
  * @param key 字典key
  * @returns
  */
-export async function useDict(key: number) {
-    let dict: Promise<dictValueList> = await useDictByKey(key);
+export async function useDict (key: number) {
+    const dict: Promise<dictValueList> = await useDictByKey(key);
     return dict;
 }
 
@@ -19,13 +19,13 @@ export async function useDict(key: number) {
  * @param collectionLabel 对照集合中的字段名称 默认 'label'
  * @returns
  */
-export function fieldTranslate(collection: Array<dictValue>, value: number, collectionField: keyof dictValue = 'value', collectionLabel: keyof dictValue = 'label') {
+export function fieldTranslate (collection: Array<dictValue>, value: number, collectionField: keyof dictValue = 'value', collectionLabel: keyof dictValue = 'label') {
     if (collection && value && value.toString().length) {
         if (Object.prototype.toString.call(collection) === '[object Array]') {
-            let checked = collection.find((ele: dictValue) => {
+            const checked = collection.find((ele: dictValue) => {
                 return ele[collectionField] == value;
             });
-            let tips = (checked && checked[collectionLabel]) || 'Error';
+            const tips = (checked && checked[collectionLabel]) || 'Error';
             return tips;
         } else {
             console.log('fieldTranslate Error: the type of the first parameter must be array!');
@@ -37,16 +37,16 @@ export function fieldTranslate(collection: Array<dictValue>, value: number, coll
     }
 }
 
-export function getDate() {
-    let date = new Date();
+export function getDate () {
+    const date = new Date();
     return {
         date: `${date.getFullYear()} / ${date.getMonth() + 1} / ${date.getDate()} 周${'日一二三四五六'.charAt(date.getDay())}`,
         imageIndex: date.getDay() + 1,
     };
 }
 
-export function getStorage(key: string): string {
-    let str: string = window.localStorage.getItem(key) ?? '';
+export function getStorage (key: string): string {
+    const str: string = window.localStorage.getItem(key) ?? '';
     try {
         if (str) {
             return JSON.parse(str)[key];
@@ -58,13 +58,13 @@ export function getStorage(key: string): string {
     }
 }
 
-export function setStorage(key: string, value: any): void {
-    let str = JSON.stringify({
+export function setStorage (key: string, value: any): void {
+    const str = JSON.stringify({
         [key]: value,
     });
     window.localStorage.setItem(key, str);
 }
 
-export function clearStorage(): void {
+export function clearStorage (): void {
     window.localStorage.clear();
 }
