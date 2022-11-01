@@ -101,7 +101,7 @@ import { defineComponent, reactive, ref } from 'vue';
 
 export default defineComponent({
     name: 'view_Article',
-    setup () {
+    setup() {
         const query = reactive<queryForm>({ pageSize: paginationConfig.pageSize, pageNum: paginationConfig.pageNum });
         const itemForm = reactive<article>({ title: '', subTitle: '', date: '', groupId: 0, author: '', index: 0, content: '' });
         const dialogVisible = ref(false);
@@ -148,29 +148,29 @@ export default defineComponent({
     watch: {
         dialogType: function (nVal, oVal) {
             switch (nVal) {
-            case dialogType.create:
-                this.formDisabled = false;
-                this.dialogTitle = 'Create';
-                break;
-            case dialogType.detail:
-                this.formDisabled = true;
-                this.dialogTitle = 'Detail';
-                break;
-            case dialogType.edit:
-                this.formDisabled = false;
-                this.dialogTitle = 'Edit';
-                break;
-            default:
-                this.dialogTitle = '';
-                break;
+                case dialogType.create:
+                    this.formDisabled = false;
+                    this.dialogTitle = 'Create';
+                    break;
+                case dialogType.detail:
+                    this.formDisabled = true;
+                    this.dialogTitle = 'Detail';
+                    break;
+                case dialogType.edit:
+                    this.formDisabled = false;
+                    this.dialogTitle = 'Edit';
+                    break;
+                default:
+                    this.dialogTitle = '';
+                    break;
             }
         },
     },
-    created () {
+    created() {
         this.handleQuery();
     },
     methods: {
-        setItemValue (item: article) {
+        setItemValue(item: article) {
             this.itemForm._id = item._id;
             this.itemForm.title = item.title;
             this.itemForm.subTitle = item.subTitle;
@@ -180,7 +180,7 @@ export default defineComponent({
             this.itemForm.index = item.index;
             this.itemForm.content = item.content;
         },
-        handleQuery () {
+        handleQuery() {
             getArticleList(this.query)
                 .then((res) => {
                     this.articleList = res;
@@ -191,7 +191,7 @@ export default defineComponent({
                     console.log(err);
                 });
         },
-        handleCreate () {
+        handleCreate() {
             this.dialogType = dialogType.create;
             this.setItemValue({
                 title: '',
@@ -204,7 +204,7 @@ export default defineComponent({
             });
             this.dialogVisible = true;
         },
-        handleDetail (item: article) {
+        handleDetail(item: article) {
             getArticleContent(item._id as string)
                 .then((res) => {
                     this.dialogType = dialogType.detail;
@@ -215,7 +215,7 @@ export default defineComponent({
                     console.log(err);
                 });
         },
-        handleEdit (item: article) {
+        handleEdit(item: article) {
             getArticleContent(item._id as string)
                 .then((res) => {
                     this.dialogType = dialogType.edit;
@@ -227,7 +227,7 @@ export default defineComponent({
                     console.log(err);
                 });
         },
-        handleDelete (item: article) {
+        handleDelete(item: article) {
             ElMessageBox.confirm(`Are you sure to delete ${item.title} ?`)
                 .then(() => {
                     deleteArticle(item._id as string)
@@ -246,61 +246,61 @@ export default defineComponent({
                     console.log(err);
                 });
         },
-        PrevPage () {
+        PrevPage() {
             this.query.pageNum -= 1;
             this.handleQuery();
         },
-        NextPage () {
+        NextPage() {
             this.query.pageNum += 1;
             this.handleQuery();
         },
         onItemSubmit: async function (formEl: FormInstance | undefined) {
             switch (this.dialogType) {
-            case dialogType.create:
-                if (!formEl) return;
-                await formEl.validate((valid, fields) => {
-                    if (valid) {
-                        delete this.itemForm._id;
-                        createArticle(this.itemForm)
-                            .then(() => {
-                                this.dialogVisible = false;
-                                ElMessage({
-                                    message: 'Updated Successfully!',
-                                    type: 'success',
+                case dialogType.create:
+                    if (!formEl) return;
+                    await formEl.validate((valid, fields) => {
+                        if (valid) {
+                            delete this.itemForm._id;
+                            createArticle(this.itemForm)
+                                .then(() => {
+                                    this.dialogVisible = false;
+                                    ElMessage({
+                                        message: 'Updated Successfully!',
+                                        type: 'success',
+                                    });
+                                    this.handleQuery();
+                                })
+                                .catch((err) => {
+                                    console.log(err);
                                 });
-                                this.handleQuery();
-                            })
-                            .catch((err) => {
-                                console.log(err);
-                            });
-                    }
-                });
-                break;
-            case dialogType.edit:
-                if (!formEl) return;
-                await formEl.validate((valid, fields) => {
-                    if (valid) {
-                        updateArticle(this.itemForm._id as string, this.itemForm)
-                            .then(() => {
-                                this.dialogVisible = false;
-                                ElMessage({
-                                    message: 'Created Successfully!',
-                                    type: 'success',
+                        }
+                    });
+                    break;
+                case dialogType.edit:
+                    if (!formEl) return;
+                    await formEl.validate((valid, fields) => {
+                        if (valid) {
+                            updateArticle(this.itemForm._id as string, this.itemForm)
+                                .then(() => {
+                                    this.dialogVisible = false;
+                                    ElMessage({
+                                        message: 'Created Successfully!',
+                                        type: 'success',
+                                    });
+                                    this.handleQuery();
+                                })
+                                .catch((err) => {
+                                    console.log(err);
                                 });
-                                this.handleQuery();
-                            })
-                            .catch((err) => {
-                                console.log(err);
-                            });
-                    }
-                });
-                break;
-            case dialogType.detail:
-                this.dialogVisible = false;
-                break;
-            default:
-                this.dialogVisible = false;
-                break;
+                        }
+                    });
+                    break;
+                case dialogType.detail:
+                    this.dialogVisible = false;
+                    break;
+                default:
+                    this.dialogVisible = false;
+                    break;
             }
         },
     },

@@ -33,7 +33,7 @@ import type { FormInstance, FormRules } from 'element-plus';
 import { defineComponent, reactive, ref } from 'vue';
 
 export default defineComponent({
-    setup () {
+    setup() {
         const form = reactive<loginForm>({
             user_name: 'admin',
             password: 'admin',
@@ -85,7 +85,7 @@ export default defineComponent({
             });
         },
     },
-    created () {
+    created() {
         this.AppName = process.env.VUE_APP_NAME as string;
     },
 });

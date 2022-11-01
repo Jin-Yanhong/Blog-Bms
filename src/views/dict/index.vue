@@ -102,7 +102,7 @@ import { defineComponent, nextTick, reactive, ref } from 'vue';
 
 export default defineComponent({
     name: 'view_Dict',
-    setup () {
+    setup() {
         const query = reactive<queryForm>({ pageSize: paginationConfig.pageSize, pageNum: paginationConfig.pageNum });
         const itemForm = reactive<dictKey>({
             key: 0,
@@ -159,29 +159,29 @@ export default defineComponent({
     watch: {
         dialogType: function (nVal) {
             switch (nVal) {
-            case dialogType.create:
-                this.formDisabled = false;
-                this.dialogTitle = 'Create';
-                break;
-            case dialogType.detail:
-                this.formDisabled = true;
-                this.dialogTitle = 'Detail';
-                break;
-            case dialogType.edit:
-                this.formDisabled = false;
-                this.dialogTitle = 'Edit';
-                break;
-            default:
-                this.dialogTitle = '';
-                break;
+                case dialogType.create:
+                    this.formDisabled = false;
+                    this.dialogTitle = 'Create';
+                    break;
+                case dialogType.detail:
+                    this.formDisabled = true;
+                    this.dialogTitle = 'Detail';
+                    break;
+                case dialogType.edit:
+                    this.formDisabled = false;
+                    this.dialogTitle = 'Edit';
+                    break;
+                default:
+                    this.dialogTitle = '';
+                    break;
             }
         },
     },
-    created () {
+    created() {
         this.handleQuery();
     },
     methods: {
-        setItemValue (item: dictKey) {
+        setItemValue(item: dictKey) {
             this.itemFormRef?.resetFields();
             this.itemForm._id = item._id;
             this.itemForm.key = item.key;
@@ -190,7 +190,7 @@ export default defineComponent({
             this.itemForm.desc = item.desc;
             this.itemForm.value = item.value;
         },
-        handleQuery () {
+        handleQuery() {
             getDictList(this.query)
                 .then((res) => {
                     this.dictList = res;
@@ -201,7 +201,7 @@ export default defineComponent({
                     console.log(err);
                 });
         },
-        handleCreate () {
+        handleCreate() {
             this.dialogType = dialogType.create;
             this.setItemValue({
                 key: 0,
@@ -212,7 +212,7 @@ export default defineComponent({
             });
             this.dialogVisible = true;
         },
-        handleDetail (item: dictKey) {
+        handleDetail(item: dictKey) {
             this.setItemValue(item);
             getDictContent(item._id as string)
                 .then((res) => {
@@ -224,7 +224,7 @@ export default defineComponent({
                     console.log(err);
                 });
         },
-        handleEdit (item: dictKey) {
+        handleEdit(item: dictKey) {
             this.setItemValue(item);
             getDictContent(item._id as string)
                 .then((res) => {
@@ -236,7 +236,7 @@ export default defineComponent({
                     console.log(err);
                 });
         },
-        handleDelete (item: dictKey) {
+        handleDelete(item: dictKey) {
             ElMessageBox.confirm(`Are you sure to delete ${item.label} ?`)
                 .then(() => {
                     deleteDict(item._id as string)
@@ -255,74 +255,74 @@ export default defineComponent({
                     // catch error
                 });
         },
-        PrevPage () {
+        PrevPage() {
             this.query.pageNum -= 1;
             this.handleQuery();
         },
-        NextPage () {
+        NextPage() {
             this.query.pageNum += 1;
             this.handleQuery();
         },
         onItemSubmit: async function (formEl: FormInstance | undefined) {
             switch (this.dialogType) {
-            case dialogType.create:
-                if (!formEl) return;
-                await formEl.validate((valid, fields) => {
-                    if (valid) {
-                        delete this.itemForm._id;
-                        createDict(this.itemForm)
-                            .then(() => {
-                                this.dialogVisible = false;
-                                ElMessage({
-                                    message: 'Created Successfully!',
-                                    type: 'success',
+                case dialogType.create:
+                    if (!formEl) return;
+                    await formEl.validate((valid, fields) => {
+                        if (valid) {
+                            delete this.itemForm._id;
+                            createDict(this.itemForm)
+                                .then(() => {
+                                    this.dialogVisible = false;
+                                    ElMessage({
+                                        message: 'Created Successfully!',
+                                        type: 'success',
+                                    });
+                                    this.handleQuery();
+                                })
+                                .catch((err) => {
+                                    console.log(err);
                                 });
-                                this.handleQuery();
-                            })
-                            .catch((err) => {
-                                console.log(err);
-                            });
-                    }
-                });
-                break;
-            case dialogType.edit:
-                if (!formEl) return;
-                await formEl.validate((valid, fields) => {
-                    if (valid) {
-                        updateDict(this.itemForm._id as string, this.itemForm)
-                            .then(() => {
-                                this.dialogVisible = false;
-                                ElMessage({
-                                    message: 'Created Successfully!',
-                                    type: 'success',
+                        }
+                    });
+                    break;
+                case dialogType.edit:
+                    if (!formEl) return;
+                    await formEl.validate((valid, fields) => {
+                        if (valid) {
+                            updateDict(this.itemForm._id as string, this.itemForm)
+                                .then(() => {
+                                    this.dialogVisible = false;
+                                    ElMessage({
+                                        message: 'Created Successfully!',
+                                        type: 'success',
+                                    });
+                                    this.handleQuery();
+                                })
+                                .catch((err) => {
+                                    console.log(err);
                                 });
-                                this.handleQuery();
-                            })
-                            .catch((err) => {
-                                console.log(err);
-                            });
-                    }
-                });
-                break;
-            case dialogType.detail:
-                this.dialogVisible = false;
-                break;
-            default:
-                this.dialogVisible = false;
-                break;
+                        }
+                    });
+                    break;
+                case dialogType.detail:
+                    this.dialogVisible = false;
+                    break;
+                default:
+                    this.dialogVisible = false;
+                    break;
             }
         },
-        handleTagDelete (tag: dictValue) {
+        handleTagDelete(tag: dictValue) {
             this.itemForm.value?.splice(this.itemForm.value?.indexOf(tag), 1);
             console.dir(this.itemForm.value);
         },
-        showInput () {
+        showInput() {
             this.inputVisible = true;
             nextTick(() => {
                 this.InputRef!.input!.focus();
             });
         },
-        handleInputConfirm () {
+        handleInputConfirm() {
             if (this.inputValue) {
                 this.itemForm?.value?.push({
                     label: this.inputValue,

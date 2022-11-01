@@ -29,7 +29,7 @@
                 "singleQuote": true,
                 "bracketSameLine": false,
                 "endOfLine": "crlf",
-                "arrowParens": "avoid"
+                "arrowParens": "always"
             }
         },
         {

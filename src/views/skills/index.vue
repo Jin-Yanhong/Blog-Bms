@@ -90,7 +90,7 @@ import { defineComponent, reactive, ref } from 'vue';
 
 export default defineComponent({
     name: 'view_Skills',
-    setup () {
+    setup() {
         const query = reactive<queryForm>({ pageSize: paginationConfig.pageSize, pageNum: paginationConfig.pageNum });
         const itemForm = reactive<skill>({ name: '', score: 0, index: 0, color: '' });
         const itemFormRef = ref<FormInstance>();
@@ -133,29 +133,29 @@ export default defineComponent({
     watch: {
         dialogType: function (nVal, oVal) {
             switch (nVal) {
-            case dialogType.create:
-                this.formDisabled = false;
-                this.dialogTitle = 'Create';
-                break;
-            case dialogType.detail:
-                this.formDisabled = true;
-                this.dialogTitle = 'Detail';
-                break;
-            case dialogType.edit:
-                this.formDisabled = false;
-                this.dialogTitle = 'Edit';
-                break;
-            default:
-                this.dialogTitle = '';
-                break;
+                case dialogType.create:
+                    this.formDisabled = false;
+                    this.dialogTitle = 'Create';
+                    break;
+                case dialogType.detail:
+                    this.formDisabled = true;
+                    this.dialogTitle = 'Detail';
+                    break;
+                case dialogType.edit:
+                    this.formDisabled = false;
+                    this.dialogTitle = 'Edit';
+                    break;
+                default:
+                    this.dialogTitle = '';
+                    break;
             }
         },
     },
-    created () {
+    created() {
         this.handleQuery();
     },
     methods: {
-        setItemValue (item: skill) {
+        setItemValue(item: skill) {
             this.itemFormRef?.resetFields();
             this.itemForm.name = item.name;
             this.itemForm.score = item.score;
@@ -163,7 +163,7 @@ export default defineComponent({
             this.itemForm.color = item.color;
             this.itemForm._id = item._id;
         },
-        handleQuery () {
+        handleQuery() {
             getSkillsList(this.query)
                 .then((res) => {
                     this.skillList = res;
@@ -174,7 +174,7 @@ export default defineComponent({
                     console.log(err);
                 });
         },
-        handleCreate () {
+        handleCreate() {
             this.dialogType = dialogType.create;
             this.setItemValue({
                 name: '',
@@ -184,17 +184,17 @@ export default defineComponent({
             });
             this.dialogVisible = true;
         },
-        handleDetail (item: skill) {
+        handleDetail(item: skill) {
             this.dialogType = dialogType.detail;
             this.dialogVisible = true;
             this.setItemValue(item);
         },
-        handleEdit (item: skill) {
+        handleEdit(item: skill) {
             this.dialogType = dialogType.edit;
             this.dialogVisible = true;
             this.setItemValue(item);
         },
-        handleDelete (item: skill) {
+        handleDelete(item: skill) {
             ElMessageBox.confirm(`Are you sure to delete ${item.name} ?`)
                 .then(() => {
                     deleteSkill(item._id as string)
@@ -213,61 +213,61 @@ export default defineComponent({
                     // catch error
                 });
         },
-        PrevPage () {
+        PrevPage() {
             this.query.pageNum -= 1;
             this.handleQuery();
         },
-        NextPage () {
+        NextPage() {
             this.query.pageNum += 1;
             this.handleQuery();
         },
         onItemSubmit: async function (formEl: FormInstance | undefined) {
             switch (this.dialogType) {
-            case dialogType.create:
-                if (!formEl) return;
-                await formEl.validate((valid, fields) => {
-                    if (valid) {
-                        delete this.itemForm._id;
-                        createSkill(this.itemForm)
-                            .then((res) => {
-                                this.dialogVisible = false;
-                                ElMessage({
-                                    message: 'Updated Successfully!',
-                                    type: 'success',
+                case dialogType.create:
+                    if (!formEl) return;
+                    await formEl.validate((valid, fields) => {
+                        if (valid) {
+                            delete this.itemForm._id;
+                            createSkill(this.itemForm)
+                                .then((res) => {
+                                    this.dialogVisible = false;
+                                    ElMessage({
+                                        message: 'Updated Successfully!',
+                                        type: 'success',
+                                    });
+                                    this.handleQuery();
+                                })
+                                .catch((err) => {
+                                    console.log(err);
                                 });
-                                this.handleQuery();
-                            })
-                            .catch((err) => {
-                                console.log(err);
-                            });
-                    }
-                });
-                break;
-            case dialogType.edit:
-                if (!formEl) return;
-                await formEl.validate((valid, fields) => {
-                    if (valid) {
-                        updateSkill(this.itemForm._id as string, this.itemForm)
-                            .then((res) => {
-                                this.dialogVisible = false;
-                                ElMessage({
-                                    message: 'Created Successfully!',
-                                    type: 'success',
+                        }
+                    });
+                    break;
+                case dialogType.edit:
+                    if (!formEl) return;
+                    await formEl.validate((valid, fields) => {
+                        if (valid) {
+                            updateSkill(this.itemForm._id as string, this.itemForm)
+                                .then((res) => {
+                                    this.dialogVisible = false;
+                                    ElMessage({
+                                        message: 'Created Successfully!',
+                                        type: 'success',
+                                    });
+                                    this.handleQuery();
+                                })
+                                .catch((err) => {
+                                    console.log(err);
                                 });
-                                this.handleQuery();
-                            })
-                            .catch((err) => {
-                                console.log(err);
-                            });
-                    }
-                });
-                break;
-            case dialogType.detail:
-                this.dialogVisible = false;
-                break;
-            default:
-                this.dialogVisible = false;
-                break;
+                        }
+                    });
+                    break;
+                case dialogType.detail:
+                    this.dialogVisible = false;
+                    break;
+                default:
+                    this.dialogVisible = false;
+                    break;
             }
         },
     },

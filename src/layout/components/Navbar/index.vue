@@ -62,7 +62,7 @@ interface tagViewsType {
 
 export default defineComponent({
     name: 'nav_Bar',
-    setup () {
+    setup() {
         const routerList = routes;
         const bgColor = memuBgColor;
         const user = useUserStore();
@@ -115,14 +115,14 @@ export default defineComponent({
         },
     },
     computed: {
-        activeMenu (): string {
+        activeMenu(): string {
             const route = this.$route;
             const path = route.path;
             return path;
         },
     },
     methods: {
-        handleLogout (): any {
+        handleLogout(): any {
             ElMessageBox.confirm('Are you confirm to logout ?', 'Warning', {
                 confirmButtonText: 'I conform',
                 cancelButtonText: 'Cancle',
@@ -132,7 +132,7 @@ export default defineComponent({
                 location.reload();
             });
         },
-        tagClose (tag: tagViewsType) {
+        tagClose(tag: tagViewsType) {
             if (this.tagViews.length === 1) {
                 return;
             } else {

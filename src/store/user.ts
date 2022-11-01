@@ -14,13 +14,13 @@ export const useUserStore = defineStore({
         },
     },
     actions: {
-        handleLogout () {
+        handleLogout() {
             this.$patch({
                 token: '',
             });
             clearStorage();
         },
-        async handleLogin (loginForm: loginForm) {
+        async handleLogin(loginForm: loginForm) {
             try {
                 const { accessToken = '' } = await login(loginForm);
                 setStorage('token', accessToken);

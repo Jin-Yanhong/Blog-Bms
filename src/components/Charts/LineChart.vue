@@ -7,7 +7,7 @@ import type { ECharts, EChartsOption } from 'echarts';
 import { graphic, init } from 'echarts';
 import { defineComponent, PropType, ref } from 'vue';
 
-function getOption () {
+function getOption() {
     return {
         title: {
             text: '2019年销售水量和主营业务收入对比',
@@ -170,7 +170,7 @@ function getOption () {
 }
 export default defineComponent({
     name: 'LineChart',
-    setup (props, ctx) {
+    setup(props, ctx) {
         const LineChart = ref<HTMLDivElement>();
         const echartsIns: ECharts | any = null;
         return {
@@ -189,21 +189,21 @@ export default defineComponent({
             this.echartsIns.setOption(nVal);
         },
     },
-    mounted () {
+    mounted() {
         this.initChart();
         const _this = this;
         window.addEventListener('resize', function () {
             _this.echartsIns.resize();
         });
     },
-    beforeUnmount () {
+    beforeUnmount() {
         const _this = this;
         window.removeEventListener('resize', function () {
             _this.echartsIns.dispose();
         });
     },
     methods: {
-        initChart () {
+        initChart() {
             this.echartsIns = init(this.LineChart as HTMLElement);
             this.echartsIns.setOption(getOption());
             this.$emit('onChartInited', this.echartsIns);

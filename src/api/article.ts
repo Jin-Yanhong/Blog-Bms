@@ -2,7 +2,7 @@ import { article, queryForm } from '@/type';
 import request from '@/utils/request';
 
 // 创建文章
-export function createArticle (doc: article): Promise<any> {
+export function createArticle(doc: article): Promise<any> {
     return request({
         url: 'article/createArticle',
         method: 'put',
@@ -12,7 +12,7 @@ export function createArticle (doc: article): Promise<any> {
     });
 }
 // 获取文章列表
-export function getArticleList (query: queryForm): Promise<any> {
+export function getArticleList(query: queryForm): Promise<any> {
     return request({
         url: 'article/getArticleList',
         method: 'get',
@@ -21,7 +21,7 @@ export function getArticleList (query: queryForm): Promise<any> {
 }
 
 // 获取文章详情
-export function getArticleContent (id: string): Promise<any> {
+export function getArticleContent(id: string): Promise<any> {
     return request({
         url: 'article/getArticleContent/' + id,
         method: 'get',
@@ -29,7 +29,7 @@ export function getArticleContent (id: string): Promise<any> {
 }
 
 // 文章更新
-export function updateArticle (id: string, doc: article): Promise<any> {
+export function updateArticle(id: string, doc: article): Promise<any> {
     return request({
         url: 'article/updateArticle/' + id,
         method: 'post',
@@ -40,7 +40,7 @@ export function updateArticle (id: string, doc: article): Promise<any> {
 }
 
 // 文章删除
-export function deleteArticle (id: string): Promise<any> {
+export function deleteArticle(id: string): Promise<any> {
     return request({
         url: 'article/deleteArticle/' + id,
         method: 'delete',

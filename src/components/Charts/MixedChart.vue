@@ -7,7 +7,7 @@ import type { ECharts, EChartsOption } from 'echarts';
 import { graphic, init } from 'echarts';
 import { defineComponent, PropType, ref } from 'vue';
 
-function getOption () {
+function getOption() {
     return {
         backgroundColor: '#080b30',
         title: {
@@ -223,7 +223,7 @@ function getOption () {
 }
 export default defineComponent({
     name: 'MixedChart',
-    setup (props, ctx) {
+    setup(props, ctx) {
         const MixedChart = ref<HTMLDivElement>();
         const echartsIns: ECharts | any = null;
         return {
@@ -242,21 +242,21 @@ export default defineComponent({
             this.echartsIns.setOption(nVal);
         },
     },
-    mounted () {
+    mounted() {
         this.initChart();
         const _this = this;
         window.addEventListener('resize', function () {
             _this.echartsIns.resize();
         });
     },
-    beforeUnmount () {
+    beforeUnmount() {
         const _this = this;
         window.removeEventListener('resize', function () {
             _this.echartsIns.dispose();
         });
     },
     methods: {
-        initChart () {
+        initChart() {
             this.echartsIns = init(this.MixedChart as HTMLElement);
             // TODO: 替换数据
             this.echartsIns.setOption(getOption());

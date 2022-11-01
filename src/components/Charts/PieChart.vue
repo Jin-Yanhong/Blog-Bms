@@ -7,7 +7,7 @@ import type { ECharts, EChartsOption } from 'echarts';
 import { init } from 'echarts';
 import { defineComponent, PropType, ref } from 'vue';
 
-function getOption () {
+function getOption() {
     return {
         backgroundColor: '#2c343c',
         title: {
@@ -93,7 +93,7 @@ function getOption () {
 }
 export default defineComponent({
     name: 'PieChart',
-    setup (props, ctx) {
+    setup(props, ctx) {
         const PieChart = ref<HTMLDivElement>();
         const echartsIns: ECharts | any = null;
         return {
@@ -112,21 +112,21 @@ export default defineComponent({
             this.echartsIns.setOption(nVal);
         },
     },
-    mounted () {
+    mounted() {
         this.initChart();
         const _this = this;
         window.addEventListener('resize', function () {
             _this.echartsIns.resize();
         });
     },
-    beforeUnmount () {
+    beforeUnmount() {
         const _this = this;
         window.removeEventListener('resize', function () {
             _this.echartsIns.dispose();
         });
     },
     methods: {
-        initChart () {
+        initChart() {
             this.echartsIns = init(this.PieChart as HTMLElement);
             this.echartsIns.setOption(getOption());
             this.$emit('onChartInited', this.echartsIns);

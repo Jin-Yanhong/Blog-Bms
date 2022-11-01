@@ -113,7 +113,7 @@ import { defineComponent, reactive, ref } from 'vue';
 
 export default defineComponent({
     name: 'view_Works',
-    setup () {
+    setup() {
         interface workDict {
             tagList: dictValue[];
             techList: dictValue[];
@@ -175,25 +175,25 @@ export default defineComponent({
     watch: {
         dialogType: function (nVal, oVal) {
             switch (nVal) {
-            case dialogType.create:
-                this.formDisabled = false;
-                this.dialogTitle = 'Create';
-                break;
-            case dialogType.detail:
-                this.formDisabled = true;
-                this.dialogTitle = 'Detail';
-                break;
-            case dialogType.edit:
-                this.formDisabled = false;
-                this.dialogTitle = 'Edit';
-                break;
-            default:
-                this.dialogTitle = '';
-                break;
+                case dialogType.create:
+                    this.formDisabled = false;
+                    this.dialogTitle = 'Create';
+                    break;
+                case dialogType.detail:
+                    this.formDisabled = true;
+                    this.dialogTitle = 'Detail';
+                    break;
+                case dialogType.edit:
+                    this.formDisabled = false;
+                    this.dialogTitle = 'Edit';
+                    break;
+                default:
+                    this.dialogTitle = '';
+                    break;
             }
         },
     },
-    created () {
+    created() {
         this.handleQuery();
         // 技术栈字典
         useDict(1).then((dict) => {
@@ -205,7 +205,7 @@ export default defineComponent({
         });
     },
     methods: {
-        setItemValue (item: work) {
+        setItemValue(item: work) {
             this.itemFormRef?.resetFields();
             this.itemForm.name = item.name;
             this.itemForm.desc = item.desc;
@@ -213,7 +213,7 @@ export default defineComponent({
             this.itemForm.technology = item.technology;
             this.itemForm.screenShortUrl = item.screenShortUrl;
         },
-        handleQuery () {
+        handleQuery() {
             getWorkList(this.query)
                 .then((res) => {
                     this.workList = res;
@@ -224,7 +224,7 @@ export default defineComponent({
                     console.log(err);
                 });
         },
-        handleCreate () {
+        handleCreate() {
             this.dialogType = dialogType.create;
             this.setItemValue({
                 index: 0,
@@ -236,18 +236,18 @@ export default defineComponent({
             });
             this.dialogVisible = true;
         },
-        handleDetail (item: work) {
+        handleDetail(item: work) {
             this.dialogType = dialogType.detail;
             this.dialogVisible = true;
             this.setItemValue(item);
         },
-        handleEdit (item: work) {
+        handleEdit(item: work) {
             this.dialogType = dialogType.edit;
             this.dialogVisible = true;
             this.setItemValue(item);
             this.itemForm._id = item._id;
         },
-        handleDelete (item: work) {
+        handleDelete(item: work) {
             ElMessageBox.confirm(`Are you sure to delete ${item.name} ?`)
                 .then(() => {
                     deleteWork(item._id as string)
@@ -266,61 +266,61 @@ export default defineComponent({
                     // catch error
                 });
         },
-        PrevPage () {
+        PrevPage() {
             this.query.pageNum -= 1;
             this.handleQuery();
         },
-        NextPage () {
+        NextPage() {
             this.query.pageNum += 1;
             this.handleQuery();
         },
         onItemSubmit: async function (formEl: FormInstance | undefined) {
             switch (this.dialogType) {
-            case dialogType.create:
-                if (!formEl) return;
-                await formEl.validate((valid, fields) => {
-                    if (valid) {
-                        delete this.itemForm._id;
-                        createWork(this.itemForm)
-                            .then(() => {
-                                this.dialogVisible = false;
-                                ElMessage({
-                                    message: 'Created Successfully!',
-                                    type: 'success',
+                case dialogType.create:
+                    if (!formEl) return;
+                    await formEl.validate((valid, fields) => {
+                        if (valid) {
+                            delete this.itemForm._id;
+                            createWork(this.itemForm)
+                                .then(() => {
+                                    this.dialogVisible = false;
+                                    ElMessage({
+                                        message: 'Created Successfully!',
+                                        type: 'success',
+                                    });
+                                    this.handleQuery();
+                                })
+                                .catch((err) => {
+                                    console.log(err);
                                 });
-                                this.handleQuery();
-                            })
-                            .catch((err) => {
-                                console.log(err);
-                            });
-                    }
-                });
-                break;
-            case dialogType.edit:
-                if (!formEl) return;
-                await formEl.validate((valid, fields) => {
-                    if (valid) {
-                        updateWork(this.itemForm._id as string, this.itemForm)
-                            .then(() => {
-                                this.dialogVisible = false;
-                                ElMessage({
-                                    message: 'Created Successfully!',
-                                    type: 'success',
+                        }
+                    });
+                    break;
+                case dialogType.edit:
+                    if (!formEl) return;
+                    await formEl.validate((valid, fields) => {
+                        if (valid) {
+                            updateWork(this.itemForm._id as string, this.itemForm)
+                                .then(() => {
+                                    this.dialogVisible = false;
+                                    ElMessage({
+                                        message: 'Created Successfully!',
+                                        type: 'success',
+                                    });
+                                    this.handleQuery();
+                                })
+                                .catch((err) => {
+                                    console.log(err);
                                 });
-                                this.handleQuery();
-                            })
-                            .catch((err) => {
-                                console.log(err);
-                            });
-                    }
-                });
-                break;
-            case dialogType.detail:
-                this.dialogVisible = false;
-                break;
-            default:
-                this.dialogVisible = false;
-                break;
+                        }
+                    });
+                    break;
+                case dialogType.detail:
+                    this.dialogVisible = false;
+                    break;
+                default:
+                    this.dialogVisible = false;
+                    break;
             }
         },
         fieldTranslate,

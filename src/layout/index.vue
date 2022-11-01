@@ -12,7 +12,7 @@ import AppMain from './components/AppMain.vue';
 import Navbar from './components/Navbar/index.vue';
 import Sidebar from './components/Sidebar/index.vue';
 export default defineComponent({
-    setup () {
+    setup() {
         return {};
     },
     name: 'Layout',
