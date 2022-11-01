@@ -1,7 +1,7 @@
 <template>
     <div class="appMain">
         <router-view />
-        <keep-alive></keep-alive>
+        <!-- <keep-alive></keep-alive> -->
     </div>
 </template>
 <script lang="ts">

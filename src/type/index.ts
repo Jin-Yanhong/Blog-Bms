@@ -46,9 +46,17 @@ export interface dictKey {
     value?: Array<dictValue>;
     _id?: string;
 }
+
+export interface fileItem {
+    name: string;
+    type: string;
+    uploadTime?: string;
+}
+
 export interface dictValueList {
     value: Array<dictValue>;
 }
+
 export interface dictValue {
     label: string;
     value: number;

@@ -4,3 +4,8 @@ export enum dialogType {
     detail = 3,
     upload = 4,
 }
+
+export enum fileLocation {
+    LocalDisk = 'LocalDisk',
+    DataBase = 'DataBase',
+}
