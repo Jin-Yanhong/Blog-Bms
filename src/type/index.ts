@@ -47,10 +47,20 @@ export interface dictKey {
     _id?: string;
 }
 
-export interface fileItem {
-    name: string;
-    type: string;
-    uploadTime?: string;
+export interface diskFile {
+    filename: string;
+    createTime: string;
+    size: number;
+    mode: string;
+}
+
+export interface databaseFile {
+    chunkSize: number;
+    contentType: string;
+    filename: string;
+    length: number;
+    uploadDate: string;
+    _id: string;
 }
 
 export interface dictValueList {

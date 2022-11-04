@@ -6,6 +6,6 @@ export enum dialogType {
 }
 
 export enum fileLocation {
-    LocalDisk = 'LocalDisk',
-    DataBase = 'DataBase',
+    FileDisk = 'FileDisk',
+    FileDB = 'FileDB',
 }

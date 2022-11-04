@@ -5,65 +5,22 @@
                 <el-col :span="10">
                     <span> Select Storage Location : </span>
                     <el-select v-model="storageLocation">
-                        <el-option value="LocalDisk" label="LocalDisk"> </el-option>
-                        <el-option value="DataBase" label="DataBase"> </el-option>
+                        <el-option value="FileDisk" label="LocalDisk"> </el-option>
+                        <el-option value="FileDB" label="DataBase"> </el-option>
                     </el-select>
-                </el-col>
-                <el-col :span="6">
-                    <el-button type="primary" @click="handleQuery">
-                        <el-icon class="el-icon--refresh"><Refresh /></el-icon> Query
-                    </el-button>
-                    <el-button type="success" @click="handleUpload">
-                        <el-icon class="el-icon--plus"><Plus /></el-icon> Upload
-                    </el-button>
                 </el-col>
             </el-row>
         </div>
-
-        <!--  -->
-        <el-table :data="fileList" class="listTable" border>
-            <el-table-column prop="index" label="Index" align="center" width="70">
-                <template #default="scope">
-                    {{ fileList.indexOf(scope.row) + 1 }}
-                </template>
-            </el-table-column>
-            <el-table-column label="Link" align="center">
-                <template #default="scope">
-                    <div>
-                        <a :href="`${assetsUrl}uploadFile/${scope.row}`" target="_blank" rel="noopener noreferrer">{{ `${assetsUrl}uploadFile/${scope.row}` }}</a>
-                    </div>
-                </template>
-            </el-table-column>
-            <el-table-column label="FileName" align="center">
-                <template #default="scope">
-                    <div>
-                        {{ scope.row }}
-                    </div>
-                </template>
-            </el-table-column>
-            <el-table-column label="Operations" width="260" align="center">
-                <template #default="scope">
-                    <el-button type="info" size="small" @click="handleFileInfo(scope.row)">
-                        <el-icon class="el-icon--infoFilled"><InfoFilled /></el-icon>Info
-                    </el-button>
-                    <el-button type="danger" size="small" @click="handleDelete(scope.row)">
-                        <el-icon class="el-icon--delete"><Delete /></el-icon>Delete
-                    </el-button>
-                </template>
-            </el-table-column>
-        </el-table>
-
-        <!--  -->
-        <el-dialog v-model="dialogVisible" :title="dialogTitle" width="40%"> 上传文件 </el-dialog>
+        <component :is="storageLocation" />
     </div>
 </template>
 <script lang="ts">
-import { listDBFiles, listDiskFiles, removeDiskFiles } from '@/api/file';
 import { dialogType, fileLocation } from '@/enum';
 import { fileItem } from '@/type';
-import { Delete, InfoFilled, Plus, Refresh } from '@element-plus/icons-vue';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { Plus, Refresh } from '@element-plus/icons-vue';
 import { defineComponent, reactive, ref } from 'vue';
+import FileDB from './FileDB.vue';
+import FileDisk from './FileDisk.vue';
 
 export default defineComponent({
     name: 'view_File',
@@ -72,7 +29,7 @@ export default defineComponent({
             name: '',
             type: '',
         });
-        const storageLocation = ref(fileLocation.LocalDisk);
+        const storageLocation = ref(fileLocation.FileDisk);
         const assetsUrl = process.env.VUE_APP_ASSETS_URL;
         const dialogVisible = ref(false);
         const fileList = reactive<Array<string>>([]);
@@ -90,9 +47,9 @@ export default defineComponent({
         };
     },
     components: {
-        Delete,
+        FileDB,
+        FileDisk,
         Refresh,
-        InfoFilled,
         Plus,
     },
     watch: {
@@ -120,50 +77,10 @@ export default defineComponent({
         this.handleQuery();
     },
     methods: {
-        handleQuery() {
-            if (this.storageLocation == fileLocation.LocalDisk) {
-                listDiskFiles()
-                    .then((res) => {
-                        this.fileList = res.files;
-                        this.$forceUpdate();
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                    });
-            } else {
-                listDBFiles()
-                    .then((res) => {
-                        this.fileList = res.files;
-                        this.$forceUpdate();
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                    });
-            }
-        },
+        handleQuery() {},
         handleUpload() {
             this.dialogType = dialogType.upload;
             this.dialogVisible = true;
-        },
-        handleFileInfo(item: string) {},
-        handleDelete(item: string) {
-            ElMessageBox.confirm(`Are you sure to delete ${item} ?`)
-                .then(() => {
-                    removeDiskFiles(item)
-                        .then((res) => {
-                            ElMessage({
-                                message: 'Deleted Successfully!',
-                                type: 'success',
-                            });
-                            this.handleQuery();
-                        })
-                        .catch((err) => {
-                            console.log(err);
-                        });
-                })
-                .catch(() => {
-                    // catch error
-                });
         },
     },
 });
