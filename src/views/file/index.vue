@@ -15,73 +15,24 @@
     </div>
 </template>
 <script lang="ts">
-import { dialogType, fileLocation } from '@/enum';
-import { fileItem } from '@/type';
-import { Plus, Refresh } from '@element-plus/icons-vue';
-import { defineComponent, reactive, ref } from 'vue';
+import { fileLocation } from '@/enum';
+import { defineComponent, ref } from 'vue';
 import FileDB from './FileDB.vue';
 import FileDisk from './FileDisk.vue';
 
 export default defineComponent({
     name: 'view_File',
     setup() {
-        const fileForm = reactive<fileItem>({
-            name: '',
-            type: '',
-        });
         const storageLocation = ref(fileLocation.FileDisk);
         const assetsUrl = process.env.VUE_APP_ASSETS_URL;
-        const dialogVisible = ref(false);
-        const fileList = reactive<Array<string>>([]);
-        const dialogTitle = ref('');
-        const dialogType = ref(0);
-
         return {
-            fileList,
-            dialogVisible,
-            dialogTitle,
-            dialogType,
             storageLocation,
             assetsUrl,
-            fileForm,
         };
     },
     components: {
         FileDB,
         FileDisk,
-        Refresh,
-        Plus,
-    },
-    watch: {
-        dialogType: function (nVal) {
-            switch (nVal) {
-                case dialogType.upload:
-                    this.dialogTitle = 'Upload';
-                    break;
-                case dialogType.detail:
-                    this.dialogTitle = 'Detail';
-                    break;
-                case dialogType.edit:
-                    this.dialogTitle = 'Edit';
-                    break;
-                default:
-                    this.dialogTitle = '';
-                    break;
-            }
-        },
-        storageLocation: function (nVal) {
-            this.handleQuery();
-        },
-    },
-    created() {
-        this.handleQuery();
-    },
-    methods: {
-        handleQuery() {},
-        handleUpload() {
-            this.dialogType = dialogType.upload;
-            this.dialogVisible = true;
-        },
     },
 });
 </script>
