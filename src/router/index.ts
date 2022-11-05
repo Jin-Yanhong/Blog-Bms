@@ -157,31 +157,34 @@ const router = createRouter({
     routes,
 });
 
-router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalized, next) => {
-    NProgress.start();
-    if (useUserStore().getToken) {
-        if (to.path === '/login') {
-            next({ path: '/' });
-            NProgress.done();
+// FIXME: 此处仅用于部署 github pages
+if (process.env.NODE_ENV === 'development') {
+    router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalized, next) => {
+        NProgress.start();
+        if (useUserStore().getToken) {
+            if (to.path === '/login') {
+                next({ path: '/' });
+                NProgress.done();
+            } else {
+                try {
+                    next();
+                } catch (err: any) {
+                    useUserStore().handleLogout();
+                    ElMessage.error(err.message || 'Has Error');
+                    next('/login');
+                    NProgress.done();
+                }
+            }
         } else {
-            try {
+            if (whiteList.indexOf(to.path) !== -1) {
                 next();
-            } catch (err: any) {
-                useUserStore().handleLogout();
-                ElMessage.error(err.message || 'Has Error');
+            } else {
                 next('/login');
                 NProgress.done();
             }
         }
-    } else {
-        if (whiteList.indexOf(to.path) !== -1) {
-            next();
-        } else {
-            next('/login');
-            NProgress.done();
-        }
-    }
-});
+    });
+}
 
 router.afterEach((to: RouteLocationNormalized) => {
     NProgress.done();
