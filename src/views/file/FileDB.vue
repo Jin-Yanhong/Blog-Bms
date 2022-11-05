@@ -43,26 +43,26 @@
             <el-form :model="fileForm" readonly label-position="top" ref="itemFormRef">
                 <el-row :gutter="10">
                     <el-col :span="12">
-                        <el-form-item label="FileName" prop="label"> <el-input v-model="fileForm.filename" placeholder="FileName" /> </el-form-item>
+                        <el-form-item label="FileName" prop="filename"> <el-input v-model="fileForm.fileName" placeholder="FileName" /> </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                        <el-form-item label="ContentType" prop="index"> <el-input v-model="fileForm.contentType" placeholder="ContentType"></el-input> </el-form-item>
-                    </el-col>
-                </el-row>
-                <el-row :gutter="10">
-                    <el-col :span="12">
-                        <el-form-item label="ChunkSize" prop="key"> <el-input v-model="fileForm.chunkSize" placeholder="ChunkSize" /> </el-form-item>
-                    </el-col>
-                    <el-col :span="12">
-                        <el-form-item label="Length" prop="desc"> <el-input v-model="fileForm.length" placeholder="Length"></el-input> </el-form-item>
+                        <el-form-item label="ContentType" prop="contentType"> <el-input v-model="fileForm.contentType" placeholder="ContentType"></el-input> </el-form-item>
                     </el-col>
                 </el-row>
                 <el-row :gutter="10">
                     <el-col :span="12">
-                        <el-form-item label="UploadDate" prop="key"> <el-input v-model="fileForm.uploadDate" placeholder="UploadDate" /> </el-form-item>
+                        <el-form-item label="ChunkSize" prop="chunkSize"> <el-input v-model="fileForm.chunkSize" placeholder="ChunkSize" /> </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                        <el-form-item label="ID" prop="desc"> <el-input v-model="fileForm._id" placeholder="ID"></el-input> </el-form-item>
+                        <el-form-item label="Length" prop="length"> <el-input v-model="fileForm.length" placeholder="Length"></el-input> </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="10">
+                    <el-col :span="12">
+                        <el-form-item label="UploadDate" prop="uploadDate"> <el-input v-model="fileForm.uploadDate" placeholder="UploadDate" /> </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="ID" prop="_id"> <el-input v-model="fileForm._id" placeholder="ID"></el-input> </el-form-item>
                     </el-col>
                 </el-row>
             </el-form>
@@ -74,11 +74,18 @@
         </el-dialog>
 
         <el-dialog v-model="uploadDialogVisible" :title="dialogTitle" width="40%">
-            文件上传
+            <el-upload class="upload-demo" drag :http-request="(e:UploadRequestOptions) => uploadFile(e)">
+                <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
+                <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
+                <template #tip>
+                    <div class="el-upload__tip">
+                        <p style="font-size: 16px" v-for="(value, name) in uploaded.file" :key="name">{{ name }}：{{ value }}</p>
+                    </div>
+                </template>
+            </el-upload>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="dialogVisible = false">Cancel</el-button>
-                    <el-button type="primary" @click="dialogVisible = false">Confirm</el-button>
+                    <el-button @click="uploadDialogVisible = false">Cancel</el-button>
                 </span>
             </template>
         </el-dialog>
@@ -88,18 +95,20 @@
 import { listDBFiles, saveFileToDataBase, downloadFileFromDB, getDataBaseFileInfo, removeFileFromDataBase } from '@/api/file';
 import { dialogType, fileLocation } from '@/enum';
 import { databaseFile } from '@/type';
-import { Delete, Download, InfoFilled, Plus, Refresh } from '@element-plus/icons-vue';
+import { Delete, Download, InfoFilled, Plus, Refresh, UploadFilled } from '@element-plus/icons-vue';
+import type { UploadRequestOptions } from 'element-plus';
 import { ElMessage, ElMessageBox, FormInstance } from 'element-plus';
 import { defineComponent, reactive, ref } from 'vue';
+import { getDate, bitToMbit } from '@/utils';
 
 export default defineComponent({
     name: 'FileDB',
     setup() {
         const fileForm = reactive<databaseFile>({
             chunkSize: 0,
-            contentType: 'image/jpeg',
-            filename: '',
-            length: 12800416,
+            contentType: '',
+            fileName: '',
+            length: 0,
             uploadDate: '',
             _id: '',
         });
@@ -110,7 +119,9 @@ export default defineComponent({
         const fileList = reactive<Array<string>>([]);
         const dialogTitle = ref('');
         const dialogType = ref(0);
-
+        const uploaded = reactive({
+            file: {},
+        });
         return {
             fileList,
             dialogVisible,
@@ -120,6 +131,7 @@ export default defineComponent({
             storageLocation,
             assetsUrl,
             fileForm,
+            uploaded,
         };
     },
     components: {
@@ -128,6 +140,7 @@ export default defineComponent({
         InfoFilled,
         Plus,
         Download,
+        UploadFilled,
     },
     watch: {
         dialogType: function (nVal) {
@@ -151,6 +164,18 @@ export default defineComponent({
         this.handleQuery();
     },
     methods: {
+        getDate,
+        bitToMbit,
+        uploadFile(e: UploadRequestOptions) {
+            const formData = new FormData();
+            formData.append('file', e.file);
+            saveFileToDataBase(formData)
+                .then((res) => {
+                    this.handleQuery();
+                    this.uploaded.file = res;
+                })
+                .catch((err) => {});
+        },
         handleQuery() {
             listDBFiles()
                 .then((res) => {
@@ -170,7 +195,7 @@ export default defineComponent({
         handleDownload(item: databaseFile) {
             ElMessageBox.confirm(`Are you sure to download ${item._id} ?`)
                 .then(() => {
-                    downloadFileFromDB(item.filename)
+                    downloadFileFromDB(item.fileName)
                         .then((res) => {
                             window.open(res, '_blank');
                         })
@@ -181,15 +206,20 @@ export default defineComponent({
         handleFileInfo(item: databaseFile) {
             getDataBaseFileInfo(item._id)
                 .then((res) => {
+                    const data = res[0];
                     this.dialogType = dialogType.detail;
                     this.dialogVisible = true;
-                    this.fileForm = res[0];
-                    this.$forceUpdate();
+                    this.fileForm._id = data._id;
+                    this.fileForm.chunkSize = data.chunkSize;
+                    this.fileForm.contentType = data.contentType;
+                    this.fileForm.fileName = data.filename;
+                    this.fileForm.length = data.length;
+                    this.fileForm.uploadDate = this.getDate(data.UploadTime).date;
                 })
                 .catch((err) => {});
         },
         handleDelete(item: databaseFile) {
-            ElMessageBox.confirm(`Are you sure to delete ${item.filename} ?`)
+            ElMessageBox.confirm(`Are you sure to delete ${item.fileName} ?`)
                 .then(() => {
                     removeFileFromDataBase(item._id)
                         .then((res) => {

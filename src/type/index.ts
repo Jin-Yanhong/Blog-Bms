@@ -48,16 +48,17 @@ export interface dictKey {
 }
 
 export interface diskFile {
-    filename: string;
     createTime: string;
+    fileName: string;
+    modifiedTime: string;
     size: number;
-    mode: string;
+    index?: number;
 }
 
 export interface databaseFile {
     chunkSize: number;
     contentType: string;
-    filename: string;
+    fileName: string;
     length: number;
     uploadDate: string;
     _id: string;
