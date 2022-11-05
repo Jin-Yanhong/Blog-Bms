@@ -1,6 +1,6 @@
 # Personal website content management system
 
-> this is web CMS, the backend api service is [here](https://github.com/.Jin-Yanhong/blogServer).
+> this is web CMS, the backend api service is [here](https://github.com/Jin-Yanhong/blogServer).
 
 ## Technology stack
 
