@@ -1,29 +1,27 @@
-# bms
+# Personal website content management system
 
-## Project setup
+> this is web CMS, the backend api service is [here](https://github.com/.Jin-Yanhong/blogServer).
+
+## Technology stack
+
+-   vue3
+-   typescript
+-   element plus
+-   paina
+-   vue router
+-   echarts
+
+## How to start
+
+firstly run
+
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+and then
+
 ```
 npm run serve
 ```
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your unit tests
-```
-npm run test:unit
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
